@@ -39,22 +39,22 @@ int main(int ac, char **av)
 	cli_len = sizeof(cli_addr);
 
 	newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &cli_len);
-
 	if (newsockfd < 0)
 		error("Error on accepting connection");
+	std::cout << "New connection successfull!\n";
 
 	while (1)
 	{
 		ft_bzero(buffer, 255);
-		//	n = read(newsockfd, buffer, 255);
-		n = recv(newsockfd, buffer, strlen(buffer), MSG_WAITALL);
+		n = read(newsockfd, buffer, 255);
+		//n = recv(newsockfd, buffer, strlen(buffer), MSG_WAITALL);
 		if (n < 0)
 			error("Error on reading");
-		//printf("Client : %s\n", buffer);
+		printf("Client : %s\n", buffer);
 		ft_bzero(buffer, 255);
 		fgets(buffer, 255, stdin);
-		n = send(newsockfd, buffer, strlen(buffer), MSG_WAITALL);
-		//n = write(newsockfd, buffer, strlen(buffer));
+		//n = send(newsockfd, buffer, strlen(buffer), MSG_WAITALL);
+		n = write(newsockfd, buffer, strlen(buffer));
 		if (n < 0)
 			error("Error on writing");
 		
