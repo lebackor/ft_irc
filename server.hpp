@@ -7,7 +7,8 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <stdexcept>
-
+#include <poll.h>
+#include <fcntl.h>
 
 void ft_bzero(void* s, std::size_t n);
 void ft_bcopy(const void* src, void* dest, std::size_t n);
