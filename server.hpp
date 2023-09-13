@@ -10,5 +10,8 @@
 #include <poll.h>
 #include <fcntl.h>
 
+#define MAX_CLIENTS 100
+
 void ft_bzero(void* s, std::size_t n);
 void ft_bcopy(const void* src, void* dest, std::size_t n);
+char	**ft_split(char const *s, char c);
