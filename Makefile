@@ -1,5 +1,6 @@
 SRCS =	server.cpp\
 		functions.cpp\
+		main.cpp\
 
 
 
