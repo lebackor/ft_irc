@@ -12,7 +12,7 @@
 #include <vector>
 #include <sstream>
 #include <map>
-
+#include "user.hpp"
 
 
 #define MAX_CLIENTS 100
@@ -51,19 +51,22 @@ class Server{
         void    recvClientMsg(int i);
         void    setserversocket();
         bool    firstConnection();
-       
+        void	   setUserInfo();
+        void        setUsers(int fd, User *user);
+        int        get_newClientSocket();
+        std::map<int, User*> &getUsers();
         Server();
         ~Server();
     private:
 
 
-       // std::map<User*, int>  _users;
         int    _serverSocket;
         char _buffer[1024];
         int _newClientSocket;
         int _portnb;
         struct sockaddr_in _servAddr, _cliAddr;
         socklen_t _cliLen;
+        std::map<int, User*>  _users;
         
 
         std::string _welcolmeirssi(int code);

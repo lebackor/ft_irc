@@ -8,10 +8,21 @@ Server::~Server(){
 	close(this->_serverSocket);
 }
 
-
+int        Server::get_newClientSocket(){
+	return (this->_newClientSocket);
+}
 struct pollfd	Server::get_clientfd()
 {
 	return (*this->clientfd);
+}
+
+std::map<int, User*> & Server::getUsers(){
+	return this->_users;
+}
+
+void Server::setUsers(int fd, User *user)
+{
+	this->_users.insert(std::make_pair(fd, user));
 }
 
 void    Server::error(const char *msg)
@@ -22,60 +33,71 @@ void    Server::error(const char *msg)
 
 bool	Server::firstConnection()
 {
-   std::istringstream iss(this->_buffer);
-    std::vector<std::string> identificationLines;
+	std::string buffer_str(_buffer);
+	
+    bool hasCapLS = buffer_str.find("CAP LS") != std::string::npos;
+    bool hasNick = buffer_str.find("NICK ") != std::string::npos;
+    bool hasUser = buffer_str.find("USER ") != std::string::npos;
 
+	if (hasCapLS == true && hasNick == true && hasUser == true)
+	{
+		setUserInfo();
+		return true;
+	}
+
+		// GERER TT LES CAS OU CAP LS ETC NE SENVOIENT PAS DUN COUP MAIS SPLIT EN 2 OU 3
+	/*if (hasCapLS == true && hasNick == false && hasUser == false)
+	if (hasCapLS == false && hasNick == true && hasUser == true)
+	if (hasCapLS == false && hasNick == false && hasUser == true)
+	if (hasCapLS == false && hasNick == true && hasUser == false)
+	if (hasCapLS == false && hasNick == false && hasUser == true)
+	if (hasCapLS == true && hasNick == true && hasUser == false)
+*/
+return false;
+}
+
+void	Server::setUserInfo()
+{
+   // Variables pour stocker les valeurs
     std::string nickname;
     std::string username;
     std::string hostname;
     std::string realname;
- //   std::string tmp;
 
+    // Créez un flux à partir du buffer
+    std::istringstream iss(_buffer);
     std::string line;
+
+    // Parcourez les lignes du flux
     while (std::getline(iss, line)) {
-        identificationLines.push_back(line);
-    }
+        // Utilisez un autre flux pour analyser chaque ligne
+        std::istringstream lineIss(line);
+        std::string command;
+        lineIss >> command;
 
-    // Vérification de la commande CAP LS
-    bool hasCapLS = false;
-  
+        if (command == "NICK") {
+            lineIss >> nickname;	
+        } if (command == "USER") {
+            std::string temp;
+            lineIss >> username >> temp >> hostname;
+            std::getline(lineIss, realname);
 
-    for (std::vector<std::string>::const_iterator it = identificationLines.begin(); it != identificationLines.end(); ++it) {
-        const std::string& identificationLine = *it;
-
-        if (identificationLine.find("CAP LS") != std::string::npos) {
-            hasCapLS = true;
-        } else if (identificationLine.find("NICK ") != std::string::npos) {
-            size_t pos = identificationLine.find("NICK ");
-            if (pos != std::string::npos) {
-                nickname = identificationLine.substr(pos + 5); // +5 pour sauter "NICK "
-            }
-        } else if (identificationLine.find("USER ") != std::string::npos) {
-            size_t pos = identificationLine.find("USER ");
-            if (pos != std::string::npos) {
-                std::string userPart = identificationLine.substr(pos + 5); // +5 pour sauter "USER "
-                std::istringstream userIss(userPart);
-                userIss >> username >> username >> hostname;
-                std::getline(userIss, realname);
-                if (!realname.empty() && realname[0] == ':') {
-					realname = realname.substr(1);
-                }
+	//		 Supprimer l'espace et le caractère ':' au début de realname
+            if (!realname.empty() && realname[0] == ' ' && realname.length() > 1 && realname[1] == ':') {
+                realname = realname.substr(2); // Ignore les deux premiers caractères
             }
         }
     }
-		std::cout << "Nickname: " << nickname << std::endl;
-		std::cout << "Username: " << username << std::endl;
-		std::cout << "Hostname: " << hostname << std::endl;
-		std::cout << "Realname: " << realname << std::endl;
-    // Vérifier si les informations d'identification de irssi sont présentes et la commande CAP LS
-    if (hasCapLS && !nickname.empty() && !username.empty() && !hostname.empty() && !realname.empty()) {
-        // Si les informations d'identification sont présentes, envoyez un message à irssi
-        return true;
-    } else {
-        // Les informations d'identification de irssi ou la commande CAP LS ne sont pas présentes
-		return false;
-	}
 
+
+//	if (this->clientfd[].fd == this->get_newClientSocket())
+
+	User *user = new User(nickname, username, hostname, realname);
+	this->setUsers(this->get_newClientSocket(), user);
+	this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
+	this->_sendMessage(this->_welcolmeirssi(002), this->_newClientSocket);
+	this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
+	this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
 }
 
 std::string Server::_welcolmeirssi(int code)
@@ -90,47 +112,23 @@ std::string Server::_welcolmeirssi(int code)
         codestr.insert(0, 1, '0');
 	}
 
-	//std::string nickname, username, hostname, realname;
+
+
     std::string serv_name = SERVER_NAME;
-
-   /* std::istringstream iss(this->_buffer);
-    
-
-    std::string line;
-    while (std::getline(iss, line)) {
-        std::istringstream lineIss(line);
-        std::string command;
-        lineIss >> command;
-        
-        if (command == "NICK") {
-            lineIss >> nickname;
-        } else if (command == "USER") {
-            lineIss >> username >> username >> hostname;
-            std::getline(lineIss, realname);
-            if (!realname.empty() && realname[0] == ':') {
-                realname = realname.substr(1);
-            }
-        }
-    }
-*/
-    // Afficher les valeurs
-
-    std::string nickname;
-    std::string username;
-    std::string hostname;
-    std::string realname;
-
 	std::string ret;
 	ret += ":" + serv_name + " " + codestr + " " + "*" + " ";	
-	nickname = "fuerza";
-	username = "len";
-	hostname = "len";
 
+
+	std::map<int, User*> tmp = getUsers();
+
+	std::string nickname = tmp[this->get_newClientSocket()]->get_nickname();
+    std::string username = tmp[this->get_newClientSocket()]->get_username();
+    std::string hostname = tmp[this->get_newClientSocket()]->get_hostname();
 
 	switch (code)
 	{
         case 001:
-            ret += RPL_WELCOME(nickname, username, hostname);
+            ret += RPL_WELCOME(nickname, username, hostname);			
 			break;
 		case 002:
             ret += RPL_YOURHOST;
@@ -235,12 +233,14 @@ void	Server::recvClientMsg(int i)
 
 		if (firstConnection() == true)
 		{
-       		this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
+			std::map<int, User*> tmp = getUsers();
+			std::cout << "User : " << tmp[get_newClientSocket()]->get_realname()  << " created linked by his socket client_id with map" << std::endl;
+     /*  		this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
 			this->_sendMessage(this->_welcolmeirssi(002), this->_newClientSocket);
 			this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
 			this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
-		}
-		else
+	*/	}
+	/*	else // dire que c pas caps ni user ni nick
 		{
 			// met le transfer pr les autres clients
 			for (int j = 1; j <= MAX_CLIENTS; j++)
@@ -248,7 +248,7 @@ void	Server::recvClientMsg(int i)
 				if (j != i && this->clientfd[j].fd != 0)
 					this->_sendMessage(this->_buffer, this->clientfd[j].fd);
 			}
-		}
+		}*/
 
 	}
 
