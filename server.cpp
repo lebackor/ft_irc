@@ -72,7 +72,7 @@ int main(int ac, char **av)
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
         error("Error opening socket");
-//    ft_bzero((char *) &serv_addr, sizeof(serv_addr));
+
     portnb = atoi(av[1]);
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -152,15 +152,6 @@ int main(int ac, char **av)
 					buffer[bytesRead] = '\0';
 					//je dois trouver un moyen de split buffer en 2 pour recup en index 0 la commande puis en index 1 le but(join, part, nick etc) if ()
 					std::cout << "Client " << i << ": " << buffer << std::endl;
-					std::vector<char *> command_vec = ft_split(buffer, ' ');
-					std::cout << command_vec[0] << std::endl;
-					if (strcmp(command_vec[0], "JOIN") == 0)
-					{
-						std::cout << "JOIN Command detected" << std::endl;
-						// Envoyez une commande IRC JOIN pour rejoindre un canal
-                        const char* joinCommand = "JOIN general";
-                        send(newClientSocket, joinCommand, strlen(joinCommand), 0);
-					}
 				}
 			}
 		}
