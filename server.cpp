@@ -6,6 +6,54 @@ void    error(const char *msg)
     exit(1);
 }
 
+std::string welcolme_irssi(int code)
+{
+	std::stringstream ss;
+	ss << code;
+	std::string codestr = ss.str();
+    if (code < 10)
+        codestr.insert(0, 2, '0');
+    else if (code < 100)
+	{
+        codestr.insert(0, 1, '0');
+	}
+
+
+	std::string ret;
+	std::string serv_name = "len ";
+    ret += ":" + serv_name+ " " + codestr + " " + "*" + " ";
+
+	std::string nickname, username, hostname;
+	nickname = "fuerza";
+	username = "len";
+	hostname = "len";
+
+	switch (code)
+	{
+        case 001:
+            ret += RPL_WELCOME(nickname, username, hostname);
+			break;
+		case 002:
+            ret += RPL_YOURHOST;
+			break;
+        case 003:
+            ret += RPL_CREATED;
+			break;
+        case 004:
+            ret += RPL_MYINFO;
+			break;		
+	}
+	return ret;
+}
+
+void sendMessage(std::string message, int sd)
+{
+	message += "\r\n";
+	if (send(sd, message.c_str(), message.length(), 0) < 0)
+		throw std::runtime_error("Error sending message.");
+}
+
+
 int main(int ac, char **av)
 {
     if (ac < 2)
@@ -64,10 +112,13 @@ int main(int ac, char **av)
 			else
 			{
 				std::cout << "Server has detected a connection !" << std::endl;
-				const char* welcomeMessage = "Welcome to my IRC server!\r\n";
-				send(newClientSocket, welcomeMessage, strlen(welcomeMessage), 0);
 				int clientFlags = fcntl(newClientSocket, F_GETFL, 0);
 				fcntl(newClientSocket, F_SETFL, clientFlags | O_NONBLOCK);
+
+				sendMessage(welcolme_irssi(001), newClientSocket);
+				sendMessage(welcolme_irssi(002), newClientSocket);
+				sendMessage(welcolme_irssi(003), newClientSocket);
+				sendMessage(welcolme_irssi(004), newClientSocket);
 			
 				for (int i = 1; i <= MAX_CLIENTS; i++)
 				{
@@ -76,9 +127,7 @@ int main(int ac, char **av)
 						fds[i].fd = newClientSocket;
 						fds[i].events = POLLIN;
 
-						// Envoyez une commande IRC JOIN pour rejoindre un canal
-                        const char* joinCommand = "JOIN general";
-                        send(newClientSocket, joinCommand, strlen(joinCommand), 0);
+
 						break;
 					}
 				}
@@ -103,6 +152,15 @@ int main(int ac, char **av)
 					buffer[bytesRead] = '\0';
 					//je dois trouver un moyen de split buffer en 2 pour recup en index 0 la commande puis en index 1 le but(join, part, nick etc) if ()
 					std::cout << "Client " << i << ": " << buffer << std::endl;
+					std::vector<char *> command_vec = ft_split(buffer, ' ');
+					std::cout << command_vec[0] << std::endl;
+					if (strcmp(command_vec[0], "JOIN") == 0)
+					{
+						std::cout << "JOIN Command detected" << std::endl;
+						// Envoyez une commande IRC JOIN pour rejoindre un canal
+                        const char* joinCommand = "JOIN general";
+                        send(newClientSocket, joinCommand, strlen(joinCommand), 0);
+					}
 				}
 			}
 		}

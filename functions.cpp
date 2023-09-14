@@ -18,14 +18,20 @@ void ft_bcopy(const void* src, void* dest, std::size_t n) {
     }
 }
 
-/*std::vector<std::string> split(const char* input, char delimiter) {
-    std::vector<std::string> tokens;
-    char* token = std::strtok(const_cast<char*>(input), &delimiter);
-    
+std::vector<char*> ft_split(const char* input, char delimiter) {
+    // Copie de la chaîne d'entrée dans une mémoire tampon
+    char* inputCopy = new char[strlen(input) + 1];
+    strcpy(inputCopy, input);
+
+    std::vector<char*> tokens;
+    char* token = strtok(inputCopy, &delimiter);
+
     while (token != NULL) {
-        tokens.push_back(std::string(token));
-        token = std::strtok(NULL, &delimiter);
+        tokens.push_back(token);
+        token = strtok(NULL, &delimiter);
     }
-    
+
+    delete[] inputCopy; // Libérer la mémoire de la copie
+
     return tokens;
-}*/
+}
