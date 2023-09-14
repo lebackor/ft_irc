@@ -11,6 +11,9 @@
 #include <fcntl.h>
 #include <vector>
 #include <sstream>
+#include <map>
+
+
 
 #define MAX_CLIENTS 100
 
@@ -43,19 +46,20 @@ class Server{
         struct pollfd   get_clientfd();
        
        
-       
         void    error(const char *msg);
         void    acceptClientconnexion();
         void    recvClientMsg(int i);
         void    setserversocket();
+        bool    firstConnection();
        
         Server();
         ~Server();
     private:
 
 
+       // std::map<User*, int>  _users;
         int    _serverSocket;
-            char _buffer[1024];
+        char _buffer[1024];
         int _newClientSocket;
         int _portnb;
         struct sockaddr_in _servAddr, _cliAddr;
