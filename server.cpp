@@ -191,6 +191,7 @@ void	Server::setserversocket()
 
 void	Server::acceptClientconnexion()
 {
+
 	this->_newClientSocket = accept(this->_serverSocket, (struct sockaddr*)&this->_cliAddr, &this->_cliLen);	
 		if (this->_newClientSocket == -1)
 			perror("Error accepting a connection");
@@ -240,16 +241,16 @@ void	Server::recvClientMsg(int i)
 			this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
 			this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
 	*/	}
-	/*	else // dire que c pas caps ni user ni nick
+		else if (firstConnection() == false)// dire que c pas caps ni user ni nick
 		{
-			// met le transfer pr les autres clients
+			// met le transfer pr les autres clients + faire en sorte d'envoyer que si il est dans un channel et ignorer : WHOIS MODE et PONG
 			for (int j = 1; j <= MAX_CLIENTS; j++)
 			{
-				if (j != i && this->clientfd[j].fd != 0)
+				std::string tmp(_buffer);
+				if ((j != i && this->clientfd[j].fd != 0) && (!tmp.find("PONG") && !tmp.find("WHOIS") && !tmp.find("MODE")))
 					this->_sendMessage(this->_buffer, this->clientfd[j].fd);
 			}
-		}*/
-
+		}
 	}
 
 // faire des conditins et des containers pr stocker les user et les channel et guetter si il est dans un channel pr envoyer vrmnt d msg et non renvoyer cap ls etc de lautre client qui vient de se log

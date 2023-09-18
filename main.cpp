@@ -15,6 +15,9 @@ int main(int ac, char **av)
     server.setserversocket();
 	while (1)
 	{
+        for (int i = 1; i <= MAX_CLIENTS; i++)
+		{
+		
 		int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
 		if (numReady == -1)
 			perror("Error of poll()");
@@ -24,8 +27,6 @@ int main(int ac, char **av)
 
 		// gerer les donnes des clients connecter la
 		
-        for (int i = 1; i <= MAX_CLIENTS; i++)
-		{
 			if (server.clientfd[i].revents & POLLIN)
 				server.recvClientMsg(i);
 		}
