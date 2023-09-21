@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +56,11 @@ class Server{
         void	   setUserInfo();
         void        setUsers(int fd, User *user);
         int        get_newClientSocket();
+
+        void    join_command(std::string tmp, int i);
+        void    part_command(std::string tmp, int i);
+        void    pong_command(std::string tmp, int i);
+
         std::map<int, User*> &getUsers();
         Server();
         ~Server();

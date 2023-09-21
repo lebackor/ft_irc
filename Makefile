@@ -2,6 +2,8 @@ SRCS =	server.cpp\
 		functions.cpp\
 		main.cpp\
 		user.cpp\
+		commands.cpp\
+		
 
 
 

@@ -63,19 +63,15 @@ return false;
 
 void	Server::setUserInfo()
 {
-   // Variables pour stocker les valeurs
     std::string nickname;
     std::string username;
     std::string hostname;
     std::string realname;
 
-    // Créez un flux à partir du buffer
     std::istringstream iss(_buffer);
     std::string line;
 
-    // Parcourez les lignes du flux
     while (std::getline(iss, line)) {
-        // Utilisez un autre flux pour analyser chaque ligne
         std::istringstream lineIss(line);
         std::string command;
         lineIss >> command;
@@ -87,16 +83,11 @@ void	Server::setUserInfo()
             lineIss >> username >> temp >> hostname;
             std::getline(lineIss, realname);
 
-	//		 Supprimer l'espace et le caractère ':' au début de realname
             if (!realname.empty() && realname[0] == ' ' && realname.length() > 1 && realname[1] == ':') {
                 realname = realname.substr(2); // Ignore les deux premiers caractères
             }
         }
     }
-
-
-//	if (this->clientfd[].fd == this->get_newClientSocket())
-
 	User *user = new User(nickname, username, hostname, realname);
 	this->setUsers(this->get_newClientSocket(), user);
 	if (_users[get_newClientSocket()])
@@ -122,11 +113,7 @@ std::string Server::_welcolmeirssi(int code)
         codestr.insert(0, 1, '0');
 	}
 
-
-
 	std::map<int, User*> tmp = getUsers();
-
-
 
 	std::string nickname = tmp[this->get_newClientSocket()]->get_nickname();
 	std::string username = tmp[this->get_newClientSocket()]->get_username();
@@ -253,40 +240,12 @@ void	Server::recvClientMsg(int i)
 		{
 			std::string tmp(_buffer);
 			if (tmp.find("PING ") != std::string::npos)
-			{
-				size_t spacepos = tmp.find(" ");
-				if (spacepos != std::string::npos) 
-				{
-					std::string tmp(_buffer);
-					std::string prefix = "PONG ";
-					std::string result = prefix;
-					std::string extracted_part = tmp.substr(spacepos + 1);
-					result.append(extracted_part);
-					this->_sendMessage(result, this->clientfd[i].fd);
-				}
-
-			}
+				pong_command(tmp, i);
 			else if (tmp.find("PART ")!= std::string::npos)
-			{
-				size_t spacepos = tmp.find(" ");
-				if (spacepos != std::string::npos) 
-				{
-					std::string tmp(_buffer);
-					std::string prefix = "PART ";
-					std::string result = prefix;
-					std::string extracted_part = tmp.substr(spacepos + 1);
-					result.append(extracted_part);
-					this->_sendMessage(result, this->clientfd[i].fd);
-				}
-				else
-				{
-					this->_sendMessage("PART", this->clientfd[i].fd);
-				}			
-			}
+				part_command(tmp, i);
 			else if(tmp.find("JOIN ") != std::string::npos)
-					this->_sendMessage(_buffer, this->clientfd[i].fd);
-			
-			if (tmp.find("JOIN ")== std::string::npos)
+				join_command(tmp, i);
+			else if (tmp.find("JOIN ")== std::string::npos)
 			{
 				for (int j = 1; j <= MAX_CLIENTS; j++)
 				{
@@ -295,11 +254,8 @@ void	Server::recvClientMsg(int i)
 				}	
 			}
 			
-			// met le transfer pr les autres clients + faire en sorte d'envoyer que si il est dans un channel et ignorer : WHOIS MODE et PONG
 		}
 	}
-
-// faire des conditins et des containers pr stocker les user et les channel et guetter si il est dans un channel pr envoyer vrmnt d msg et non renvoyer cap ls etc de lautre client qui vient de se log
 
 }
 
