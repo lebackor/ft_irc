@@ -10,28 +10,36 @@ int main(int ac, char **av)
         exit(1);
     }
 	Server server;
-
-	server.av = av;
-    server.setserversocket();
-	while (1)
+	try
 	{
-        for (int i = 1; i <= MAX_CLIENTS; i++)
+		server.av = av;
+		server.setserversocket();
+		while (1)
 		{
-		
-		int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
-		if (numReady == -1)
-			perror("Error of poll()");
+			for (int i = 1; i <= MAX_CLIENTS; i++)
+			{
+			
+			int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
+			if (numReady == -1)
+				perror("Error of poll()");
 
-		if (server.clientfd[0].revents & POLLIN) // ce serait mieux de faire boucle i pour check chaque node, ici on perd des ressources pr rien car il entre dedans dans  tt les cas et accept quand il en capte une
-			server.acceptClientconnexion();
+			if (server.clientfd[0].revents & POLLIN) // ce serait mieux de faire boucle i pour check chaque node, ici on perd des ressources pr rien car il entre dedans dans  tt les cas et accept quand il en capte une
+				server.acceptClientconnexion();
 
-		// gerer les donnes des clients connecter la
+			// gerer les donnes des clients connecter la
+			
+				if (server.clientfd[i].revents & POLLIN)
+					server.recvClientMsg(i);
+			}
 		
-			if (server.clientfd[i].revents & POLLIN)
-				server.recvClientMsg(i);
 		}
-	
+
 	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 
 	return (0);
 }

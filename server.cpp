@@ -31,8 +31,12 @@ void    Server::error(const char *msg)
     exit(1);
 }
 
-bool	Server::firstConnection()
+bool	Server::firstConnection(int i)
 {
+	(void) i;
+//	if (_users[clientfd[i].fd]) //look in the map if my
+//		return false;
+
 	std::string buffer_str(_buffer);
 	
     bool hasCapLS = buffer_str.find("CAP LS") != std::string::npos;
@@ -53,6 +57,7 @@ bool	Server::firstConnection()
 	if (hasCapLS == false && hasNick == false && hasUser == true)
 	if (hasCapLS == true && hasNick == true && hasUser == false)
 */
+
 return false;
 }
 
@@ -94,10 +99,15 @@ void	Server::setUserInfo()
 
 	User *user = new User(nickname, username, hostname, realname);
 	this->setUsers(this->get_newClientSocket(), user);
-	this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
-	this->_sendMessage(this->_welcolmeirssi(002), this->_newClientSocket);
-	this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
-	this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
+	if (_users[get_newClientSocket()])
+	{
+		this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
+		this->_sendMessage(this->_welcolmeirssi(002), this->_newClientSocket);
+		this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
+		this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
+	}
+	else
+		std::cerr << "Error user class not defined, it should be" << std::endl;
 }
 
 std::string Server::_welcolmeirssi(int code)
@@ -114,30 +124,28 @@ std::string Server::_welcolmeirssi(int code)
 
 
 
-    std::string serv_name = SERVER_NAME;
-	std::string ret;
-	ret += ":" + serv_name + " " + codestr + " " + "*" + " ";	
-
-
 	std::map<int, User*> tmp = getUsers();
 
-	std::string nickname = tmp[this->get_newClientSocket()]->get_nickname();
-    std::string username = tmp[this->get_newClientSocket()]->get_username();
-    std::string hostname = tmp[this->get_newClientSocket()]->get_hostname();
 
+
+	std::string nickname = tmp[this->get_newClientSocket()]->get_nickname();
+	std::string username = tmp[this->get_newClientSocket()]->get_username();
+	std::string hostname = tmp[this->get_newClientSocket()]->get_hostname();
+	std::string ret;
+	ret += ":" + hostname + " " + codestr + " " + "*" + " ";	
 	switch (code)
 	{
         case 001:
             ret += RPL_WELCOME(nickname, username, hostname);			
 			break;
 		case 002:
-            ret += RPL_YOURHOST;
+            ret += RPL_YOURHOST(hostname);
 			break;
         case 003:
             ret += RPL_CREATED;
 			break;
         case 004:
-            ret += RPL_MYINFO;
+            ret += RPL_MYINFO(hostname);
 			break;		
 	}
 	return ret;
@@ -148,6 +156,7 @@ void Server::_sendMessage(std::string message, int sd)
 	message += "\r\n";
 	if (send(sd, message.c_str(), message.length(), 0) < 0)
 		throw std::runtime_error("Error sending message.");
+	std::cout << "Server has sent this message: " << message << std::endl;
 }
 
 
@@ -185,7 +194,6 @@ void	Server::setserversocket()
 	int flags = fcntl(this->_serverSocket, F_GETFL);
 	fcntl(this->_serverSocket, F_SETFL, flags | O_NONBLOCK);
 
-	std::cout << "Socket server initialized" << std::endl;
 }
 
 
@@ -232,24 +240,62 @@ void	Server::recvClientMsg(int i)
 		//je dois trouver un moyen de split buffer en 2 pour recup en index 0 la commande puis en index 1 le but(join, part, nick etc) if ()
 		std::cout << "Client " << i << ": " << this->_buffer << std::endl;
 
-		if (firstConnection() == true)
+		if (firstConnection(i) == true)
 		{
 			std::map<int, User*> tmp = getUsers();
-			std::cout << "User : " << tmp[get_newClientSocket()]->get_realname()  << " created linked by his socket client_id with map" << std::endl;
-     /*  		this->_sendMessage(this->_welcolmeirssi(001), this->_newClientSocket);
-			this->_sendMessage(this->_welcolmeirssi(002), this->_newClientSocket);
-			this->_sendMessage(this->_welcolmeirssi(003), this->_newClientSocket);
-			this->_sendMessage(this->_welcolmeirssi(004), this->_newClientSocket);
-	*/	}
-		else if (firstConnection() == false)// dire que c pas caps ni user ni nick
+			std::string user_name = tmp[this->clientfd[i].fd]->get_realname();
+			if (tmp.empty())
+				std::cout << "erreur ya pas de nom" << std::endl;
+			else
+				std::cout << "User: " << user_name << "created\n"; // Ajoutez cette ligne pour vérifier le contenu de user_name
+		}
+		else if (firstConnection(i) == false)// dire que c pas caps ni user ni nick
 		{
-			// met le transfer pr les autres clients + faire en sorte d'envoyer que si il est dans un channel et ignorer : WHOIS MODE et PONG
-			for (int j = 1; j <= MAX_CLIENTS; j++)
+			std::string tmp(_buffer);
+			if (tmp.find("PING ") != std::string::npos)
 			{
-				std::string tmp(_buffer);
-				if ((j != i && this->clientfd[j].fd != 0) && (!tmp.find("PONG") && !tmp.find("WHOIS") && !tmp.find("MODE")))
-					this->_sendMessage(this->_buffer, this->clientfd[j].fd);
+				size_t spacepos = tmp.find(" ");
+				if (spacepos != std::string::npos) 
+				{
+					std::string tmp(_buffer);
+					std::string prefix = "PONG ";
+					std::string result = prefix;
+					std::string extracted_part = tmp.substr(spacepos + 1);
+					result.append(extracted_part);
+					this->_sendMessage(result, this->clientfd[i].fd);
+				}
+
 			}
+			else if (tmp.find("PART ")!= std::string::npos)
+			{
+				size_t spacepos = tmp.find(" ");
+				if (spacepos != std::string::npos) 
+				{
+					std::string tmp(_buffer);
+					std::string prefix = "PART ";
+					std::string result = prefix;
+					std::string extracted_part = tmp.substr(spacepos + 1);
+					result.append(extracted_part);
+					this->_sendMessage(result, this->clientfd[i].fd);
+				}
+				else
+				{
+					this->_sendMessage("PART", this->clientfd[i].fd);
+				}			
+			}
+			else if(tmp.find("JOIN ") != std::string::npos)
+					this->_sendMessage(_buffer, this->clientfd[i].fd);
+			
+			if (tmp.find("JOIN ")== std::string::npos)
+			{
+				for (int j = 1; j <= MAX_CLIENTS; j++)
+				{
+					if ((i != j) && this->clientfd[j].fd != 0)
+						this->_sendMessage(this->_buffer, this->clientfd[j].fd); // envoie le msg a tt les clients mais je verifie pas le channel etc a peaufiner
+				}	
+			}
+			
+			// met le transfer pr les autres clients + faire en sorte d'envoyer que si il est dans un channel et ignorer : WHOIS MODE et PONG
 		}
 	}
 

@@ -17,7 +17,7 @@
 
 #define MAX_CLIENTS 100
 
-#define SERVER_NAME "localhost"
+//#define SERVER_NAME "localhost"
 #define ver "1.0"
 #define USER_MODE "ior"
 #define CHANNEL_MODE "ovamntlkb"
@@ -27,8 +27,8 @@
     (":Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host)
 
 //002
-#define RPL_YOURHOST \
-    ("Your host is " SERVER_NAME ", running version " ver)
+#define RPL_YOURHOST(hostname) \
+    ("Your host is " + hostname + ", running version " ver)
 
 //003
 #define RPL_CREATED \
@@ -36,8 +36,8 @@
 
 
 
-#define RPL_MYINFO \
-    (SERVER_NAME " " ver " " USER_MODE " " CHANNEL_MODE)
+#define RPL_MYINFO(hostname) \
+    (hostname + " " ver " " USER_MODE " " CHANNEL_MODE)
 
 class Server{
     public:
@@ -50,7 +50,7 @@ class Server{
         void    acceptClientconnexion();
         void    recvClientMsg(int i);
         void    setserversocket();
-        bool    firstConnection();
+        bool    firstConnection(int i);
         void	   setUserInfo();
         void        setUsers(int fd, User *user);
         int        get_newClientSocket();
@@ -79,4 +79,4 @@ class Server{
 
 void ft_bzero(void* s, std::size_t n);
 void ft_bcopy(const void* src, void* dest, std::size_t n);
-std::vector<char*> ft_split(const char* input, char delimiter);
+std::vector<char*> ft_split(char* input, char delimiter);

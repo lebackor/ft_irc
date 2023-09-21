@@ -18,7 +18,7 @@ void ft_bcopy(const void* src, void* dest, std::size_t n) {
     }
 }
 
-std::vector<char*> ft_split(const char* input, char delimiter) {
+std::vector<char*> ft_split(char* input, char delimiter) {
     char* inputCopy = new char[strlen(input) + 1];
     strcpy(inputCopy, input);
 
