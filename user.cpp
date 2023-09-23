@@ -4,12 +4,12 @@
 User::User(std::string nick, std::string user, std::string host, std::string realname)
  : _nick(nick), _user(user), _host(host), _realname(realname)
 {
-  /*  std::cout << "From User class : " << std::endl;
+    std::cout << "From User class : " << std::endl;
     std::cout << "Nickname: " << _nick << std::endl;
     std::cout << "Username: " << _user << std::endl;
     std::cout << "Hostname: " << _host << std::endl;
     std::cout << "Realname: " << _realname << std::endl;
-*/
+
 }
 
 User::~User()
@@ -50,4 +50,15 @@ std::string User::get_hostname(){
 
 std::string User::get_realname(){
     return (this->_realname);
+}
+
+std::set<std::string> &User::get_channels(){
+    return (this->_channels);
+}
+
+void User::addchannel(std::string name)
+{
+    if (this->_channels.find(name) == this->_channels.end())
+        this->_channels.insert(name);
+    std::cout << "channel added: " << name << std::endl;
 }

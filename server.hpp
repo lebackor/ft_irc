@@ -15,8 +15,8 @@
 #include <sstream>
 #include <map>
 #include "user.hpp"
-
-
+#include "channel.hpp"
+#include <set>
 #define MAX_CLIENTS 100
 
 //#define SERVER_NAME "localhost"
@@ -55,13 +55,17 @@ class Server{
         bool    firstConnection(int i);
         void	   setUserInfo();
         void        setUsers(int fd, User *user);
+        void        setChannels(std::string name, Channel *channel);
         int        get_newClientSocket();
 
         void    join_command(std::string tmp, int i);
         void    part_command(std::string tmp, int i);
         void    pong_command(std::string tmp, int i);
 
+        User*    find_user(int fd);
+
         std::map<int, User*> &getUsers();
+        std::map<std::string, Channel*> &getChannels();
         Server();
         ~Server();
     private:
@@ -74,6 +78,7 @@ class Server{
         struct sockaddr_in _servAddr, _cliAddr;
         socklen_t _cliLen;
         std::map<int, User*>  _users;
+        std::map<std::string, Channel*> _channels;
         
 
         std::string _welcolmeirssi(int code);

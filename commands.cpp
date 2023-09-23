@@ -29,11 +29,30 @@ void    Server::part_command(std::string tmp, int i)
         this->_sendMessage(tmp, this->clientfd[i].fd);
     }
     else */
-    this->_sendMessage(":fuerza!len@localhost PART #x Bye", this->clientfd[i].fd); // wrote in brut have to adapt for all user
+    User* usr = find_user(i);
+
+    this->_sendMessage(":" + usr->get_nickname() + "!" + usr->get_username() + "@" + usr->get_hostname() + " " + "PART " + "#x " + " Bye", this->clientfd[i].fd);
 }
+
 
 void	Server::join_command(std::string tmp, int i)
 {
-	this->_sendMessage(tmp, this->clientfd[i].fd);
+    std::string channelname;
+
+    
+    if (!tmp.empty() && tmp[0] == '#')
+    {
+        channelname = tmp.substr(1);
+    }
+        
+	Channel* channel = new Channel(channelname);
+    
+    setChannels(channelname, channel);
+
+    User *usr = this->_users[clientfd[i].fd];
+
+    usr->addchannel(channelname);
+    
+    this->_sendMessage(tmp, this->clientfd[i].fd);
 
 }

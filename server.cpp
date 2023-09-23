@@ -20,6 +20,16 @@ std::map<int, User*> & Server::getUsers(){
 	return this->_users;
 }
 
+std::map<std::string, Channel*> & Server::getChannels(){
+	return this->_channels;
+}
+
+void	Server::setChannels(std::string name, Channel *channel)
+{
+	this->_channels.insert(std::make_pair(name, channel));
+}
+
+
 void Server::setUsers(int fd, User *user)
 {
 	this->_users.insert(std::make_pair(fd, user));
@@ -29,6 +39,11 @@ void    Server::error(const char *msg)
 {
     perror(msg);
     exit(1);
+}
+
+User*	Server::find_user(int fd)
+{
+	return (this->getUsers()[this->clientfd[fd].fd]);
 }
 
 bool	Server::firstConnection(int i)
@@ -245,7 +260,8 @@ void	Server::recvClientMsg(int i)
 				part_command(tmp, i);
 			else if(tmp.find("JOIN ") != std::string::npos)
 				join_command(tmp, i);
-			else if (tmp.find("JOIN ")== std::string::npos)
+			//else if (tmp.find("JOIN ")== std::string::npos)
+			else
 			{
 				for (int j = 1; j <= MAX_CLIENTS; j++)
 				{

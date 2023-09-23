@@ -3,6 +3,7 @@ SRCS =	server.cpp\
 		main.cpp\
 		user.cpp\
 		commands.cpp\
+		channel.cpp\
 		
 
 

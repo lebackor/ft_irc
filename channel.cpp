@@ -1,12 +1,11 @@
-#include "server.hpp"
+#include "channel.hpp"
 
 
-class Channel{
-    public:
+Channel::Channel(std::string name) :_name(name){}
 
+Channel::~Channel(){}
 
-
-    private:
-
-
-};
+std::string Channel::get_channelname()
+{
+    return (_name);
+}
