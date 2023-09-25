@@ -241,17 +241,17 @@ void	Server::recvClientMsg(int i)
 		this->_buffer[bytesRead] = '\0';
 		//je dois trouver un moyen de split buffer en 2 pour recup en index 0 la commande puis en index 1 le but(join, part, nick etc) if ()
 		std::cout << "Client " << i << ": " << this->_buffer << std::endl;
-
+		bool firstconnection = firstConnection(i);
 		std::map<int, User*> tmp_user = getUsers();
-		if (firstConnection(i) == true)
+		if (firstconnection == true)
 		{
-			std::string user_name = tmp_user[this->clientfd[i].fd]->get_realname();
-			if (tmp_user.empty())
+			std::string user_name = tmp_user[clientfd[i].fd]->get_username();
+			if (!tmp_user[clientfd[i].fd])
 				std::cout << "erreur ya pas de nom" << std::endl;
 			else
 				std::cout << "User: " << user_name << "created\n"; // Ajoutez cette ligne pour vérifier le contenu de user_name
 		}
-		else if (firstConnection(i) == false)// dire que c pas caps ni user ni nick
+		else if (firstconnection == false)// dire que c pas caps ni user ni nick
 		{
 			std::string tmp(_buffer);
 			if (tmp.find("PING ") != std::string::npos)
@@ -261,7 +261,7 @@ void	Server::recvClientMsg(int i)
 			else if(tmp.find("JOIN ") != std::string::npos)
 				join_command(tmp, i);
 			//else if (tmp.find("JOIN ")== std::string::npos)
-			else
+			else //if (tmp.find("PRIVMSG ") != std::string::npos && tmp_user[this->clientfd[i].fd])
 			{
 				std::set<std::string> chan = tmp_user[clientfd[i].fd]->get_channels();
 				//if (!chan.empty() && )

@@ -31,7 +31,14 @@ void    Server::part_command(std::string tmp, int i)
     else */
     User* usr = find_user(i);
 
-    this->_sendMessage(":" + usr->get_nickname() + "!" + usr->get_username() + "@" + usr->get_hostname() + " " + "PART " + "#x " + " Bye", this->clientfd[i].fd);
+    std::string channelname;
+    if (!tmp.empty())
+    {
+        int p = tmp.find(' ');
+        
+        channelname = tmp.substr(p + 2);
+        this->_sendMessage(":" + usr->get_nickname() + "!" + usr->get_username() + "@" + usr->get_hostname() + " " + "PART #" + channelname, this->clientfd[i].fd);
+    }
 }
 
 
