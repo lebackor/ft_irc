@@ -242,11 +242,11 @@ void	Server::recvClientMsg(int i)
 		//je dois trouver un moyen de split buffer en 2 pour recup en index 0 la commande puis en index 1 le but(join, part, nick etc) if ()
 		std::cout << "Client " << i << ": " << this->_buffer << std::endl;
 
+		std::map<int, User*> tmp_user = getUsers();
 		if (firstConnection(i) == true)
 		{
-			std::map<int, User*> tmp = getUsers();
-			std::string user_name = tmp[this->clientfd[i].fd]->get_realname();
-			if (tmp.empty())
+			std::string user_name = tmp_user[this->clientfd[i].fd]->get_realname();
+			if (tmp_user.empty())
 				std::cout << "erreur ya pas de nom" << std::endl;
 			else
 				std::cout << "User: " << user_name << "created\n"; // Ajoutez cette ligne pour vérifier le contenu de user_name
@@ -263,6 +263,8 @@ void	Server::recvClientMsg(int i)
 			//else if (tmp.find("JOIN ")== std::string::npos)
 			else
 			{
+				std::set<std::string> chan = tmp_user[clientfd[i].fd]->get_channels();
+				//if (!chan.empty() && )
 				for (int j = 1; j <= MAX_CLIENTS; j++)
 				{
 					if ((i != j) && this->clientfd[j].fd != 0)

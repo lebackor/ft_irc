@@ -40,9 +40,12 @@ void	Server::join_command(std::string tmp, int i)
     std::string channelname;
 
     
-    if (!tmp.empty() && tmp[0] == '#')
+    if (!tmp.empty() && tmp.find(' ') != std::string::npos)
     {
-        channelname = tmp.substr(1);
+        int p = tmp.find(' ');
+
+        channelname = tmp.substr(p + 2);
+    
     }
         
 	Channel* channel = new Channel(channelname);
