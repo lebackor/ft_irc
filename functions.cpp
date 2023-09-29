@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 void ft_bzero(void* s, std::size_t n) {
     char* p = static_cast<char*>(s);
     while (n--) {
@@ -33,4 +34,8 @@ std::vector<char*> ft_split(char* input, char delimiter) {
     delete[] inputCopy; 
 
     return tokens;
+}
+
+void removeSpaces(std::string &str) {
+    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
 }

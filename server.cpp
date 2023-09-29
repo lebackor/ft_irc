@@ -29,6 +29,16 @@ void	Server::setChannels(std::string name, Channel *channel)
 	this->_channels.insert(std::make_pair(name, channel));
 }
 
+void	Server::setServername(std::string servername)
+{
+	this->_serverName = servername;
+}
+
+std::string	Server::getServername()
+{
+	return this->_serverName;
+}
+
 
 void Server::setUsers(int fd, User *user)
 {
@@ -76,12 +86,23 @@ bool	Server::firstConnection(int i)
 return false;
 }
 
+int Server::searchUserby_nickname(std::string nickname)
+{
+    for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+    {
+        if (nickname.compare(it->second->get_nickname()) == 0)
+            return it->first;
+    }
+    return (-1);
+}
+
 void	Server::setUserInfo()
 {
     std::string nickname;
     std::string username;
     std::string hostname;
     std::string realname;
+	std::string servername;
 
     std::istringstream iss(_buffer);
     std::string line;
@@ -94,8 +115,7 @@ void	Server::setUserInfo()
         if (command == "NICK") {
             lineIss >> nickname;	
         } if (command == "USER") {
-            std::string temp;
-            lineIss >> username >> temp >> hostname;
+            lineIss >> username >> servername >> hostname;
             std::getline(lineIss, realname);
 
             if (!realname.empty() && realname[0] == ' ' && realname.length() > 1 && realname[1] == ':') {
@@ -103,6 +123,7 @@ void	Server::setUserInfo()
             }
         }
     }
+	this->setServername(servername);
 	User *user = new User(nickname, username, hostname, realname);
 	this->setUsers(this->get_newClientSocket(), user);
 	if (_users[get_newClientSocket()])
@@ -261,15 +282,16 @@ void	Server::recvClientMsg(int i)
 			else if(tmp.find("JOIN ") != std::string::npos)
 				join_command(tmp, i);
 			//else if (tmp.find("JOIN ")== std::string::npos)
-			else //if (tmp.find("PRIVMSG ") != std::string::npos && tmp_user[this->clientfd[i].fd])
+			else if (tmp.find("PRIVMSG ") != std::string::npos)
 			{
-				std::set<std::string> chan = tmp_user[clientfd[i].fd]->get_channels();
+				priv_msg(tmp, i);
+				/*std::set<std::string> chan = tmp_user[clientfd[i].fd]->get_channels();
 				//if (!chan.empty() && )
 				for (int j = 1; j <= MAX_CLIENTS; j++)
 				{
 					if ((i != j) && this->clientfd[j].fd != 0)
 						this->_sendMessage(this->_buffer, this->clientfd[j].fd); // envoie le msg a tt les clients mais je verifie pas le channel etc a peaufiner
-				}	
+				}*/	
 			}
 			
 		}

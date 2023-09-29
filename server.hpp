@@ -34,12 +34,22 @@
 
 //003
 #define RPL_CREATED \
-    ("This server was created 03/04/02")
+("This server was created 03/04/02")
 
+#define ERR_NEEDMOREPARAMS(command) \
+    (command + " :Not enough parameters")
 
+#define ERR_NOTONCHANNEL(channel) \
+    (channel + " :You're not on that channel")
+
+#define ERR_NOSUCHCHANNEL(channel) \
+    (channel + " :No such channel")
 
 #define RPL_MYINFO(hostname) \
     (hostname + " " ver " " USER_MODE " " CHANNEL_MODE)
+
+#define ERR_USERNOTINCHANNEL(nick, channel) \
+    (nick + " " + channel + " :They aren't on that channel")
 
 class Server{
     public:
@@ -61,11 +71,19 @@ class Server{
         void    join_command(std::string tmp, int i);
         void    part_command(std::string tmp, int i);
         void    pong_command(std::string tmp, int i);
+        void    priv_msg(std::string buffer, int fd);
+        void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
+        
+        void sendinchanexceptuser(std::string message, Channel *chan, int sd);
+        int searchUserby_nickname(std::string nickname);
+
 
         User*    find_user(int fd);
 
         std::map<int, User*> &getUsers();
         std::map<std::string, Channel*> &getChannels();
+        void    setServername(std::string servername);
+        std::string    getServername();
         Server();
         ~Server();
     private:
@@ -79,6 +97,7 @@ class Server{
         socklen_t _cliLen;
         std::map<int, User*>  _users;
         std::map<std::string, Channel*> _channels;
+        std::string _serverName;
         
 
         std::string _welcolmeirssi(int code);
@@ -92,3 +111,6 @@ class Server{
 void ft_bzero(void* s, std::size_t n);
 void ft_bcopy(const void* src, void* dest, std::size_t n);
 std::vector<char*> ft_split(char* input, char delimiter);
+std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std::string buf2);
+std::string print_user(User *usr);
+void removeSpaces(std::string &str);

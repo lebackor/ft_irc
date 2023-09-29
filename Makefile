@@ -4,6 +4,7 @@ SRCS =	server.cpp\
 		user.cpp\
 		commands.cpp\
 		channel.cpp\
+		sendmsgncodes.cpp\
 		
 
 
