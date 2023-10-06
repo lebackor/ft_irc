@@ -24,15 +24,15 @@
 #define USER_MODE "ior"
 #define CHANNEL_MODE "ovamntlkb"
 
-//001
+
 #define RPL_WELCOME(nick, user, host) \
     (":Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host)
 
-//002
+
 #define RPL_YOURHOST(hostname) \
     ("Your host is " + hostname + ", running version " ver)
 
-//003
+
 #define RPL_CREATED \
 ("This server was created 03/04/02")
 
@@ -51,6 +51,24 @@
 #define ERR_USERNOTINCHANNEL(nick, channel) \
     (nick + " " + channel + " :They aren't on that channel")
 
+#define RPL_NOTOPIC(channel) \
+    (channel + " :No topic is set")
+
+#define ERR_NONICKNAMEGIVEN \
+    (":No nickname given")
+
+#define RPL_NAMREPLY(channel, listOfUsers) \
+    ("= " + channel + " :" + listOfUsers)
+
+#define RPL_ENDOFNAMES(channel) \
+    (channel + " :End of NAMES list")
+
+#define ERR_ERRONEUSNICKNAME(nick) \
+    (nick +" :Erroneous nickname")
+
+#define ERR_NICKNAMEINUSE(nick) \
+    (nick + " :Nickname is already in use")
+
 class Server{
     public:
         char **av;
@@ -67,12 +85,15 @@ class Server{
         void        setUsers(int fd, User *user);
         void        setChannels(std::string name, Channel *channel);
         int        get_newClientSocket();
-
+        bool    nicknameAlreadyUse(std::string nick);
+        void    sendtoeveryone(std::string message, Channel *chan);
+        
         void    join_command(std::string tmp, int i);
         void    part_command(std::string tmp, int i);
         void    pong_command(std::string tmp, int i);
         void    priv_msg(std::string buffer, int fd);
         void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
+        void    nick_command(std::string buffer, int fd);
         
         void sendinchanexceptuser(std::string message, Channel *chan, int sd);
         int searchUserby_nickname(std::string nickname);
@@ -114,3 +135,6 @@ std::vector<char*> ft_split(char* input, char delimiter);
 std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std::string buf2);
 std::string print_user(User *usr);
 void removeSpaces(std::string &str);
+bool nicknameIsValid(std::string nick);
+bool checkInvalidCharacter(char c);
+bool channelNameInvalid(std::string name);

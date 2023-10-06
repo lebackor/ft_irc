@@ -56,6 +56,17 @@ User*	Server::find_user(int fd)
 	return (this->getUsers()[this->clientfd[fd].fd]);
 }
 
+bool Server::nicknameAlreadyUse(std::string nick)
+{
+    for (std::map<int, User *>::iterator it = this->getUsers().begin(); it != this->getUsers().end(); it++)
+    {
+        if (nick.compare(it->second->get_nickname()) == 0)
+            return (true);
+    }
+    return (false);
+}
+
+
 bool	Server::firstConnection(int i)
 {
 	(void) i;
@@ -281,18 +292,10 @@ void	Server::recvClientMsg(int i)
 				part_command(tmp, i);
 			else if(tmp.find("JOIN ") != std::string::npos)
 				join_command(tmp, i);
-			//else if (tmp.find("JOIN ")== std::string::npos)
 			else if (tmp.find("PRIVMSG ") != std::string::npos)
-			{
 				priv_msg(tmp, i);
-				/*std::set<std::string> chan = tmp_user[clientfd[i].fd]->get_channels();
-				//if (!chan.empty() && )
-				for (int j = 1; j <= MAX_CLIENTS; j++)
-				{
-					if ((i != j) && this->clientfd[j].fd != 0)
-						this->_sendMessage(this->_buffer, this->clientfd[j].fd); // envoie le msg a tt les clients mais je verifie pas le channel etc a peaufiner
-				}*/	
-			}
+			else if (tmp.find("NICK ") != std::string::npos)
+				nick_command(tmp, i);
 			
 		}
 	}

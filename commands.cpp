@@ -69,9 +69,74 @@ void    Server::part_command(std::string tmp, int i)
 }
 
 
-void	Server::join_command(std::string tmp, int i)
+void	Server::join_command(std::string buffer, int i)
 {
-    std::string channelname;
+    
+    size_t k = 0, j = 0;
+    std::string buf(buffer);
+    std::string channelsName = "";
+    if ((k = buf.find_first_not_of(" \t\r\n", 5)) != std::string::npos)
+        channelsName = buf.substr(k, ((j = buf.find_first_of(" \t\r\n", k)) - k));
+    if (channelsName.empty())
+    {
+        this->_sendMessage(send_codes(461, this, find_user(i), "JOIN", ""), this->clientfd[i].fd);
+        return;
+    }
+    int nbOfChannels = 1 + std::count(channelsName.begin(), channelsName.end(), ',');
+    std::string keysForChannels = "";
+    if (buf.find_first_not_of(" \t\r\n", j) != std::string::npos)
+    {
+        j = buf.find_first_not_of(" \t\r\n", j);
+        keysForChannels = buf.substr(j, (buf.find_first_of(" \t\r\n", j) - j));
+    }
+    for (int k = 0; k < nbOfChannels; k++)
+    {
+        std::string channelName = channelsName.substr(0, channelsName.find(","));
+        channelsName.erase(0, channelsName.find(",") + 1);
+        if (find_user(i)->ls_channel() > 10)
+        {
+            this->_sendMessage(send_codes(405, this, find_user(i), channelName, ""), this->clientfd[i].fd);
+            break;
+        }
+        if (!channelNameInvalid(channelName))
+        {
+            this->_sendMessage(channelName + ":Erroneous Channel Name", this->clientfd[i].fd);
+            continue;
+        }
+        std::string key = keysForChannels.substr(0, keysForChannels.find(","));
+        keysForChannels.erase(0, keysForChannels.find(",") + 1);
+        if (this->getChannels().find(channelName) == this->getChannels().end())
+        {
+            Channel *chan = new Channel(channelName);
+            this->setChannels(channelName, chan);
+        }
+
+        if (this->getChannels().find(channelName)->second->getUsersNb() == 0)
+            this->getChannels().find(channelName)->second->addChanops(this->clientfd[i].fd, find_user(i));
+        else if (this->getChannels().find(channelName)->second->searchuserbyname(find_user(i)->get_nickname()) != -1)
+            return;
+        else
+            this->getChannels().find(channelName)->second->addUser(this->clientfd[i].fd, find_user(i));
+        find_user(i)->addchannel(channelName);
+        std::string userAnswer = print_user(find_user(i));
+        userAnswer += "JOIN " + channelName;
+        if (this->getChannels().find(channelName)->second->get_mode().find("a") == std::string::npos)
+            sendtoeveryone(userAnswer, this->getChannels().find(channelName)->second);
+        if (this->getChannels().find(channelName)->second->get_topic() == "")
+            this->_sendMessage(send_codes(331, this, find_user(i), channelName, ""), this->clientfd[i].fd);
+        else
+            this->_sendMessage(send_codes(332, this, find_user(i), channelName, this->getChannels().find(channelName)->second->get_topic()), this->clientfd[i].fd);
+        std::string listOfUser = this->getChannels().find(channelName)->second->get_userlistinchan();
+        if (this->getChannels().find(channelName)->second->get_mode().find("a") == std::string::npos)
+        {
+            this->_sendMessage(send_codes(353, this, find_user(i), channelName, listOfUser), this->clientfd[i].fd);
+            this->_sendMessage(send_codes(366, this, find_user(i), channelName, ""), this->clientfd[i].fd);
+        }
+        if (!this->getChannels().find(channelName)->second->get_mode().empty())
+            this->_sendMessage(send_codes(324, this, find_user(i), channelName, this->getChannels().find(channelName)->second->get_mode()), this->clientfd[i].fd);
+    }
+ /*
+   std::string channelname;
 
     int p = tmp.find(' ');
 
@@ -99,8 +164,9 @@ void	Server::join_command(std::string tmp, int i)
     this->_sendMessage(tmp, this->clientfd[i].fd);
 
 
+ */
 }
-
+/*
 void Server::mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd)
 {
     int i = 0;
@@ -131,7 +197,7 @@ void Server::mode_o_command(Channel *channel, std::string mode, std::string tmp,
     this->_sendMessage(response, userfd);
 
 }
-
+*/
 void    Server::priv_msg(std::string buffer, int fd)
 {
     int tmp;
@@ -172,4 +238,37 @@ void    Server::priv_msg(std::string buffer, int fd)
         else
             this->_sendMessage(userAnswer, userToSendSd);       
     }
+}
+
+void Server::nick_command(std::string buffer, int fd)
+{
+    size_t i = 0;
+    std::string newNickname = "";
+    std::string buf(buffer);
+    if ((i = buf.find_first_not_of(" \t\r\n", 5)) != std::string::npos)
+        newNickname = buf.substr(i, (buf.find_first_of(" \t\r\n", i) - i));
+    if (newNickname.empty())
+    {
+        this->_sendMessage(send_codes(431, this, find_user(fd), "", ""), this->clientfd[fd].fd);
+        return;
+    }
+   /* if (find_user(fd)->getMode().find('r') != std::string::npos)
+    {
+        this->_sendMessage(send_codes(484, this, find_user(fd), "", ""), fd);
+        return;
+    }*/
+    if (!nicknameIsValid(newNickname))
+    {
+        this->_sendMessage(send_codes(432, this, find_user(fd), newNickname, ""), this->clientfd[fd].fd);
+        return;
+    }
+    if (this->nicknameAlreadyUse(newNickname))
+    {
+        this->_sendMessage(send_codes(433, this, find_user(fd), newNickname, ""), this->clientfd[fd].fd);
+        return;
+    }
+    std::string userAnswer = print_user(find_user(fd));
+    userAnswer += "NICK " + newNickname;
+    this->_sendMessage(userAnswer, this->clientfd[fd].fd);
+    find_user(fd)->setnickname(newNickname);
 }

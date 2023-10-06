@@ -21,6 +21,12 @@ class Channel{
         ~Channel();
 
         std::string get_channelname();
+        std::string get_mode();
+        void        set_mode(std::string mode);
+        std::string get_topic();
+
+        void        set_topic(std::string topic);
+        std::string get_userlistinchan();
         void    rm_user(int fd);
         void    addUser(int fd, User *usr);
         int     getUsersNb();
@@ -35,6 +41,7 @@ class Channel{
     private:
         std::string _name;
         std::string _topic;
+        std::string _mode;
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
         std::map<std::string, std::string>  _banlist;

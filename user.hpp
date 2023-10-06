@@ -26,6 +26,12 @@ class User{
         std::set<std::string> &get_channels();
         void    addchannel(std::string name);
 
+        size_t ls_channel();
+
+        void    setnickname(std::string name);
+        void    setuser(std::string name);
+        void    sethost(std::string name);
+        void    setrealname(std::string name);
     private:
         std::string _nick;
         std::string _user;
@@ -33,8 +39,4 @@ class User{
         std::string _realname;
         std::set<std::string> _channels;
 
-        void    _setnickname(std::string name);
-        void    _setuser(std::string name);
-        void    _sethost(std::string name);
-        void    _setrealname(std::string name);
 };

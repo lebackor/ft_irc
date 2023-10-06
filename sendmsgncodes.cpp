@@ -32,6 +32,24 @@ std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std:
         case 442:
             ret += ERR_NOTONCHANNEL(buf1);
 				break;
+        case 431:
+            ret += ERR_NONICKNAMEGIVEN;
+		    	break;
+        case 432:
+            ret += ERR_ERRONEUSNICKNAME(buf1);
+			    break;
+        case 433:
+            ret += ERR_NICKNAMEINUSE(buf1);
+			    break;
+        case 331:
+            ret += RPL_NOTOPIC(buf1);
+		    	break;
+        case 353:
+            ret += RPL_NAMREPLY(buf1, buf2);
+			    break;
+        case 366:
+            ret += RPL_ENDOFNAMES(buf1);
+			    break;   
     }
 
     return ret;
@@ -56,4 +74,12 @@ void Server::sendinchanexceptuser(std::string message, Channel *chan, int sd)
             this->_sendMessage(message, it->first);
     }
 
+}
+
+void Server::sendtoeveryone(std::string message, Channel *chan)
+{
+    for (std::map<int, User *>::iterator it = chan->getUsers().begin(); it != chan->getUsers().end(); it++)
+        this->_sendMessage(message, it->first);
+    for (std::map<int, User *>::iterator it = chan->getChanOps().begin(); it != chan->getChanOps().end(); it++)
+        this->_sendMessage(message, it->first);
 }

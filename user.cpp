@@ -17,20 +17,20 @@ User::~User()
 
 }
 
-void    User::_setnickname(std::string name){
+void    User::setnickname(std::string name){
     this->_nick = name;
 }
 
-void    User::_setuser(std::string name){
+void    User::setuser(std::string name){
     this->_user = name;
 
 }
 
-void    User::_sethost(std::string name){
+void    User::sethost(std::string name){
     this->_host = name;
 }
 
-void    User::_setrealname(std::string name){
+void    User::setrealname(std::string name){
     this->_realname = name;
 }
 
@@ -61,4 +61,10 @@ void User::addchannel(std::string name)
     if (this->_channels.find(name) == this->_channels.end())
         this->_channels.insert(name);
     std::cout << "channel added: " << name << std::endl;
+}
+
+
+size_t User::ls_channel()
+{
+    return this->_channels.size();
 }

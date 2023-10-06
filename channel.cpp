@@ -35,6 +35,14 @@ std::map<int, User*> & Channel::getChanOps()
     return this->_chanUserOps;
 }
 
+std::string Channel::get_topic(){
+    return this->_topic;
+}
+
+void        Channel::set_topic(std::string topic){
+    this->_topic = topic;
+}
+
 
 void Channel::addUser(int fd, User *usr)
 {
@@ -61,6 +69,26 @@ bool    Channel::isChanop(int fd)
     return (false);
 }
 
+std::string Channel::get_userlistinchan()
+{
+    std::string output;
+    for (std::map<int, User *>::iterator it = this->_chanUserOps.begin(); it != this->_chanUserOps.end(); it++)
+    {
+        if (!output.empty())
+            output += " ";
+        output += "@";
+        output += it->second->get_nickname();
+    }
+    for (std::map<int, User *>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+    {
+        if (!output.empty())
+            output += " ";
+        output += it->second->get_nickname();
+    }
+    return (output);
+}
+
+
 int Channel::searchuserbyname(std::string nickname)
 {
     for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
@@ -74,4 +102,19 @@ int Channel::searchuserbyname(std::string nickname)
             return it->first;
     }
     return (-1);
+}
+
+std::string Channel::get_mode(){
+    return this->_mode;
+}
+
+
+void        Channel::set_mode(std::string mode){
+    size_t pos = this->_mode.find(mode);
+    if (pos != std::string::npos)
+    {
+        this->_mode.erase(pos, mode.length());
+    }
+    else
+        this->_mode += mode; 
 }
