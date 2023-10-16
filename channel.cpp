@@ -22,7 +22,7 @@ void    Channel::rm_user(int fd)
 
 int Channel::getUsersNb() 
 {
-    return (this->_users.size());
+    return (this->_users.size() + this->_chanUserOps.size());
 }
 
 std::map<int, User*> & Channel::getUsers()
@@ -117,4 +117,15 @@ void        Channel::set_mode(std::string mode){
     }
     else
         this->_mode += mode; 
+}
+
+
+void    Channel::set_key(std::string key)
+{
+    this->_key = key;
+}
+
+std::string Channel::get_key()
+{
+    return this->_key;
 }

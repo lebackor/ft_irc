@@ -24,12 +24,14 @@ class Channel{
         std::string get_mode();
         void        set_mode(std::string mode);
         std::string get_topic();
+        std::string get_key();
+        int     getUsersNb();
 
         void        set_topic(std::string topic);
         std::string get_userlistinchan();
+        void        set_key(std::string key);
         void    rm_user(int fd);
         void    addUser(int fd, User *usr);
-        int     getUsersNb();
         std::map<int, User*> &getUsers();
         std::map<int, User*> &getChanOps();
         std::map<std::string, std::string> &getBanlist();
@@ -42,6 +44,7 @@ class Channel{
         std::string _name;
         std::string _topic;
         std::string _mode;
+        std::string _key;
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
         std::map<std::string, std::string>  _banlist;

@@ -20,11 +20,29 @@ std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std:
     
     switch (code)
     {
+        case 001:
+            ret += RPL_WELCOME(usr->get_nickname(), usr->get_username(), usr->get_hostname());			
+		    	break;
+		case 002:
+            ret += RPL_YOURHOST(usr->get_hostname());
+		    	break;
+        case 003:
+            ret += RPL_CREATED;
+		    	break;
+        case 004:
+            ret += RPL_MYINFO(usr->get_hostname());
+		    	break;
+        case 005:
+            ret += RPL_BOUNCE(serv->getServername(), serv->getPort());
+                break;
         case 461:
             ret += ERR_NEEDMOREPARAMS(buf1);
 			    break;        
         case 403:
             ret += ERR_NOSUCHCHANNEL(buf1);
+                break;
+        case 405:
+            ret += ERR_TOOMANYCHANNELS(buf1);
                 break;
         case 441:
             ret += ERR_USERNOTINCHANNEL(buf1, buf2);
@@ -50,6 +68,27 @@ std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std:
         case 366:
             ret += RPL_ENDOFNAMES(buf1);
 			    break;   
+        case 401:
+            ret += ERR_NOSUCHNICK(buf1);
+			    break;
+        case 381:
+            ret += RPL_YOUREOPER;
+			    break;
+        case 464:
+            ret += ERR_PASSWDMISMATCH;
+		    	break;
+        case 482:
+            ret += ERR_CHANOPRIVSNEEDED(buf1);
+		    	break;
+        case 484:
+            ret += ERR_RESTRICTED;
+			    break;
+        case 324:
+            ret += RPL_CHANNELMODEIS(buf1, buf2);
+                break;
+        case 332:
+            ret += RPL_TOPIC(buf1, buf2);
+			    break;
     }
 
     return ret;

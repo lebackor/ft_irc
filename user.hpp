@@ -23,6 +23,7 @@ class User{
         std::string get_username();
         std::string get_hostname();
         std::string get_realname();
+        std::string get_mode();
         std::set<std::string> &get_channels();
         void    addchannel(std::string name);
 
@@ -32,11 +33,13 @@ class User{
         void    setuser(std::string name);
         void    sethost(std::string name);
         void    setrealname(std::string name);
+        void    set_mode(std::string mode);
     private:
         std::string _nick;
         std::string _user;
         std::string _host;
         std::string _realname;
+        std::string _mode;
         std::set<std::string> _channels;
 
 };

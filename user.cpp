@@ -68,3 +68,13 @@ size_t User::ls_channel()
 {
     return this->_channels.size();
 }
+
+std::string User::get_mode()
+{
+    return this->_mode;
+}
+
+void User::set_mode(std::string mode)
+{
+    this->_mode = mode;
+}
