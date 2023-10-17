@@ -1,16 +1,3 @@
-25 09 - 13h30
-Parser la commande PRIVMSG #x :mdr POUR RECUP le channel et faire des condition dans le renvoie des msg des clients pr envoyer que SI ils sont dans le meme chan
-
-20h
-part command almost finish have to put securities like if i send part #ldr mais je suis dans #l envoyer un msg au client que le channel existe pas
-#define sep std::string(" \t\r\n")
-
-
-7/10/23
-
-jai une erreur jcrois quele client me capte en tant que * et nn fueraz jsp pq mais dcp ca refuse pas la connexion d'un autre client avc un autre nom et dcp sur mon client jmpl * et sur celui de l'autre c'est fueraz
-
-
 
 /////
 
