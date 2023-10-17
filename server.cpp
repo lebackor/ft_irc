@@ -97,10 +97,6 @@ std::string Server::receiveMessage(int sd)
 
 void	Server::check_connection()
 {
-
-	//inform user of socket number - used in send and receive commands
-	std::cout << "New connection , socket fd is " << this->_newClientSocket << " , ip is : " << inet_ntoa(_cliAddr.sin_addr) << " , port : " <<  ntohs(_cliAddr.sin_port) << std::endl;
-	//send new connection greeting message
 	std::string ret(_buffer);
 	size_t occ;
 	size_t firstOcc;
@@ -204,7 +200,6 @@ void	Server::check_connection()
 			if ((occ = ret.find("USER ")) != std::string::npos)
 			{
 				int i = 0;
-				//username
 				if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 				{
 					std::cout << "error 211 " << std::endl;
@@ -213,7 +208,6 @@ void	Server::check_connection()
 				else
 				{
 					user = ret.substr(firstOcc, (i = ret.find_first_of(" \t\r\n", firstOcc)) - firstOcc);
-					//hostname
 					if ((firstOcc = ret.find_first_not_of(" \t\r\n", i)) == std::string::npos)
 					{
 								std::cout << "error 217 " << std::endl;
@@ -222,7 +216,6 @@ void	Server::check_connection()
 					else
 					{
 						host = ret.substr(firstOcc, (i = ret.find_first_of(" \t\r\n", firstOcc)) - firstOcc);
-						//serverName
 						if ((firstOcc = ret.find_first_not_of(" \t\r\n", i)) == std::string::npos)
 						{
 							std::cout << "error 223 " << std::endl;
@@ -232,7 +225,6 @@ void	Server::check_connection()
 						else
 						{
 							serverName = ret.substr(firstOcc, (i = ret.find_first_of(" \t\r\n", firstOcc)) - firstOcc);
-							//realName
 							if ((firstOcc = ret.find_first_not_of(" \t\r\n", i)) == std::string::npos)
 							{
 								std::cout << "error 229 " << std::endl;
@@ -272,20 +264,7 @@ void	Server::check_connection()
 		this->_sendMessage(send_codes(002, this, newUser, "", ""), this->_newClientSocket);
 		this->_sendMessage(send_codes(003, this, newUser, "", ""), this->_newClientSocket);
 		this->_sendMessage(send_codes(004, this, newUser, "", ""), this->_newClientSocket);
-		//add new socket to array of sockets
-		
-	//	int clientFlags = fcntl(this->_newClientSocket, F_GETFL, 0);
-	//	fcntl(this->_newClientSocket, F_SETFL, clientFlags | O_NONBLOCK);
-	//	for (int i = 0; i < MAX_CLIENTS; i++)
-	//	{
-	//		//if position is empty
-	//		if (this->clientfd[i].fd == 0)
-	//		{
-	//			this->clientfd[i].fd = this->_newClientSocket;
-	//			this->clientfd[i].events = POLLIN;
-	//			break;
-	//		}
-		//}
+
 	}
 	else if (isPassGood == true && isNickGood == true && isUserGood == true)
 		this->_sendMessage(send_codes(005, this, NULL, nick, ""), this->_newClientSocket);
@@ -305,21 +284,8 @@ bool	Server::firstConnection(int i)
     bool hasUser = buffer_str.find("USER ") != std::string::npos;
 
 	if (hasCapLS == true || hasNick == true || hasUser == true || hasPASS == true)
-	{
-		//setUserInfo();
 		return true;
-	}
-
-		// GERER TT LES CAS OU CAP LS ETC NE SENVOIENT PAS DUN COUP MAIS SPLIT EN 2 OU 3
-	/*if (hasCapLS == true && hasNick == false && hasUser == false)
-	if (hasCapLS == false && hasNick == true && hasUser == true)
-	if (hasCapLS == false && hasNick == false && hasUser == true)
-	if (hasCapLS == false && hasNick == true && hasUser == false)
-	if (hasCapLS == false && hasNick == false && hasUser == true)
-	if (hasCapLS == true && hasNick == true && hasUser == false)
-*/
-
-return false;
+	return false;
 }
 
 int Server::searchUserby_nickname(std::string nickname)

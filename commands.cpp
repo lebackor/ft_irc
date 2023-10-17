@@ -346,7 +346,8 @@ void	Server::join_command(std::string buffer, int i)
             Channel *chan = new Channel(channelName);
             this->setChannels(channelName, chan);
         }
-        if (this->getChannels().find(channelName)->second->get_mode().find("k") != std::string::npos)
+      
+       if (this->getChannels().find(channelName)->second->get_mode().find("k") != std::string::npos)
         {
             if (key.empty() && this->getChannels().find(channelName)->second->get_key().compare("") != 0)
             {
@@ -367,6 +368,7 @@ void	Server::join_command(std::string buffer, int i)
                 continue;
             }
         }
+      
         if (this->getChannels().find(channelName)->second->getUsersNb() == 0)
             this->getChannels().find(channelName)->second->addChanops(this->clientfd[i].fd, find_user(i));
         else if (this->getChannels().find(channelName)->second->searchuserbyname(find_user(i)->get_nickname()) != -1)
@@ -376,12 +378,14 @@ void	Server::join_command(std::string buffer, int i)
         find_user(i)->addchannel(channelName);
         std::string userAnswer = print_user(find_user(i));
         userAnswer += "JOIN " + channelName;
+        if (this->getChannels().find(channelName)->second->get_mode().find("a") == std::string::npos) // maybe to remove cause im not handling 'anonymous' mode
+            sendtoeveryone(userAnswer, this->getChannels().find(channelName)->second);
         if (this->getChannels().find(channelName)->second->get_topic() == "")
             this->_sendMessage(send_codes(331, this, find_user(i), channelName, ""), this->clientfd[i].fd);
         else
             this->_sendMessage(send_codes(332, this, find_user(i), channelName, this->getChannels().find(channelName)->second->get_topic()), this->clientfd[i].fd);
         std::string listOfUser = this->getChannels().find(channelName)->second->get_userlistinchan();
-        if (this->getChannels().find(channelName)->second->get_mode().find("a") == std::string::npos)
+        if (this->getChannels().find(channelName)->second->get_mode().find("a") == std::string::npos) // maybe to remove cause im not handling 'anonymous' mode
         {
             this->_sendMessage(send_codes(353, this, find_user(i), channelName, listOfUser), this->clientfd[i].fd);
             this->_sendMessage(send_codes(366, this, find_user(i), channelName, ""), this->clientfd[i].fd);
@@ -424,13 +428,11 @@ void    Server::mode_o_command(Channel *channel, std::string mode, std::string b
 
 void    Server::mode_l_command(Channel *channel, std::string mode, std::string buffer, int fd)
 {
-    std::cout << "in mode l before return " << std::endl;
     if (mode[0] == '-')
     {
 	    channel->set_maxUser(-1);
 	    return;
     }
-    std::cout << "in mode l after return " << std::endl;
     int i = 0;
     for (int j = 0; buffer[i] && j < 3; i++)
     {
@@ -442,7 +444,6 @@ void    Server::mode_l_command(Channel *channel, std::string mode, std::string b
             i--;
         }
     }
-    std::cout << "in mode l after while " << std::endl;
 
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     int maxUser = std::strtoul(name.c_str(), NULL, 0);
@@ -456,14 +457,11 @@ void    Server::mode_l_command(Channel *channel, std::string mode, std::string b
 
 void    Server::mode_k_command(Channel *channel, std::string mode, std::string buffer, int fd)
 {
-    std::cout << "dans mode k" << std::endl;
     if (mode[0] == '-')
     {
         channel->set_key("");
-        //channel->rm_mode("k");
         return ;
     }
-    std::cout << "dans mode k apr return" << std::endl;
     int i = 0;
     for (int j = 0; buffer[i] && j < 3; i++)
     {
@@ -478,7 +476,6 @@ void    Server::mode_k_command(Channel *channel, std::string mode, std::string b
     std::string key = buffer.substr(i, (buffer.find_first_of(" \t\r\n", i) - i));
     if (key.compare("x") == 0)
     {
-        std::cout << "dans mode k x" << std::endl;
         this->_sendMessage(send_codes(467, this, find_user(fd), channel->get_key(), ""), this->clientfd[fd].fd);
     }
     else
@@ -487,7 +484,6 @@ void    Server::mode_k_command(Channel *channel, std::string mode, std::string b
             channel->set_key(key);
         else
         {
-            std::cout << "wrong key dans mode k" << std::endl;
             std::string keycmp = print_user(find_user(fd));
             this->_sendMessage(keycmp + ": Wrong key!", this->clientfd[fd].fd);
         }
@@ -585,7 +581,7 @@ void Server::nick_command(std::string buffer, int fd)
         this->_sendMessage(send_codes(431, this, find_user(fd), "", ""), this->clientfd[fd].fd);
         return;
     }
-   /* if (find_user(fd)->getMode().find('r') != std::string::npos)
+   /* if (find_user(fd)->getMode().find('r') != std::string::npos) //im not handling restricted mode
     {
         this->_sendMessage(send_codes(484, this, find_user(fd), "", ""), fd);
         return;
