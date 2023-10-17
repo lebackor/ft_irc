@@ -92,11 +92,29 @@
 #define ERR_RESTRICTED \
     (":Your connection is restricted!")
 
+#define ERR_BADCHANNELKEY(channel) \
+    (channel + " :Cannot join channel (+k)")
+
+#define ERR_CHANNELISFULL(channel) \
+    (channel + " :Cannot join channel (+l)")
+
 #define RPL_YOUREOPER \
     (":You are now an IRC operator")
 
+//473
+#define ERR_INVITEONLYCHAN(channel) \
+    (channel + " :Cannot join channel (+i)")
+
 #define ERR_PASSWDMISMATCH \
     (":Password incorrect")
+
+//476
+#define ERR_KEYSET(channel)\
+    (channel + " :Channel key already set")
+
+//472    
+#define ERR_UNKNOWNMODE(c, channel) \
+    (c + ":is unknown mode char to me for " + channel)
 
 class Server{
     public:
@@ -125,7 +143,10 @@ class Server{
         void    mode_channel_handler(std::string buffer, int fd);
         void    channel_mode(Channel *channel, std::string mode, int fd, std::string buffer);
 
-      //  void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
+        void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
+        void    mode_k_command(Channel *channel, std::string mode, std::string buffer, int fd);
+        void    mode_l_command(Channel *channel, std::string mode, std::string buffer, int fd);
+    
         void    oper_command(std::string buffer, int fd);
         void    nick_command(std::string buffer, int fd);
         void topic_command(std::string buffer, int sd);

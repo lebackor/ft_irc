@@ -26,7 +26,9 @@ class Channel{
         std::string get_topic();
         std::string get_key();
         int     getUsersNb();
+        int     get_maxUser();
 
+        void    set_maxUser(int maxUser);
         void        set_topic(std::string topic);
         std::string get_userlistinchan();
         void        set_key(std::string key);
@@ -45,6 +47,7 @@ class Channel{
         std::string _topic;
         std::string _mode;
         std::string _key;
+        int         _maxUser;
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
         std::map<std::string, std::string>  _banlist;

@@ -9,3 +9,9 @@ part command almost finish have to put securities like if i send part #ldr mais 
 7/10/23
 
 jai une erreur jcrois quele client me capte en tant que * et nn fueraz jsp pq mais dcp ca refuse pas la connexion d'un autre client avc un autre nom et dcp sur mon client jmpl * et sur celui de l'autre c'est fueraz
+
+
+
+/////
+
+nc : ne pas crée la classe user tant que j'ai pas recu PASS USER et NICK donc tjr passer  dans la fonction recv msg et faire une conditio ndans recv qui va parser le msg uniquement si la classe user (qui sera link avec le fd en qt est crée)

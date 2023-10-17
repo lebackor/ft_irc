@@ -89,6 +89,17 @@ std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std:
         case 332:
             ret += RPL_TOPIC(buf1, buf2);
 			    break;
+        case 471:
+            ret += ERR_CHANNELISFULL(buf1);
+			    break;
+        case 475:
+            ret += ERR_BADCHANNELKEY(buf1);
+			    break;
+        case 467:
+            ret += ERR_KEYSET(buf1);
+                break;
+        case 472:
+            ret += ERR_UNKNOWNMODE(buf1, buf2);
     }
 
     return ret;

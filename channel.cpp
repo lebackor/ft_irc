@@ -110,22 +110,26 @@ std::string Channel::get_mode(){
 
 
 void        Channel::set_mode(std::string mode){
-    size_t pos = this->_mode.find(mode);
-    if (pos != std::string::npos)
-    {
-        this->_mode.erase(pos, mode.length());
-    }
-    else
-        this->_mode += mode; 
+    this->_mode = mode;
 }
 
 
 void    Channel::set_key(std::string key)
 {
     this->_key = key;
+    std::cout << "Set key in channel" << this->get_channelname() << "to :" << key << std::endl;
 }
 
 std::string Channel::get_key()
 {
     return this->_key;
+}
+
+int     Channel::get_maxUser(){
+    return this->_maxUser;
+}
+
+void    Channel::set_maxUser(int maxUser){
+    this->_maxUser = maxUser;
+    std::cout << "Max user set to " << this->_maxUser << std::endl;
 }

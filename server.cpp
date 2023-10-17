@@ -529,6 +529,8 @@ void	Server::recvClientMsg(int i)
 				topic_command(tmp, i);
 			else if (tmp.find("KICK ") != std::string::npos)
 				kick_command(tmp, i);
+			else if(tmp.find("MODE ") != std::string::npos)
+				mode_channel_handler(tmp, i);
 		}
 	}
 
