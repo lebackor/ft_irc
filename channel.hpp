@@ -34,6 +34,9 @@ class Channel{
         void        set_key(std::string key);
         void    rm_user(int fd);
         void    addUser(int fd, User *usr);
+        void        set_invited(int fd);
+
+        std::vector<int>    get_invited();
         std::map<int, User*> &getUsers();
         std::map<int, User*> &getChanOps();
         std::map<std::string, std::string> &getBanlist();
@@ -50,5 +53,6 @@ class Channel{
         int         _maxUser;
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
+        std::vector<int> _invited;
         std::map<std::string, std::string>  _banlist;
 };

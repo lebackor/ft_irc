@@ -108,13 +108,21 @@
 #define ERR_PASSWDMISMATCH \
     (":Password incorrect")
 
-//476
+//467
 #define ERR_KEYSET(channel)\
     (channel + " :Channel key already set")
 
 //472    
 #define ERR_UNKNOWNMODE(c, channel) \
     (c + ":is unknown mode char to me for " + channel)
+//341
+#define RPL_INVITING(channel, nick) \
+    (channel + " " +nick)
+
+//443   
+#define ERR_USERONCHANNEL(user, channel) \
+    (user + " " + channel + ":is already on channel")
+
 
 class Server{
     public:

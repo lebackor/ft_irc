@@ -100,6 +100,16 @@ std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std:
                 break;
         case 472:
             ret += ERR_UNKNOWNMODE(buf1, buf2);
+                break;
+        case 341:
+            ret += RPL_INVITING(buf1, buf2);
+                break;
+        case 443:
+            ret += ERR_USERONCHANNEL(buf1, buf2);
+                break;
+        case 473:
+            ret += ERR_INVITEONLYCHAN(buf1);
+                break;
     }
 
     return ret;

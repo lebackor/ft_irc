@@ -497,6 +497,8 @@ void	Server::recvClientMsg(int i)
 				kick_command(tmp, i);
 			else if(tmp.find("MODE ") != std::string::npos)
 				mode_channel_handler(tmp, i);
+			else if(tmp.find("INVITE ") != std::string::npos)
+				invite_command(tmp, i);
 		}
 	}
 

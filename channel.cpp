@@ -133,3 +133,13 @@ void    Channel::set_maxUser(int maxUser){
     this->_maxUser = maxUser;
     std::cout << "Max user set to " << this->_maxUser << std::endl;
 }
+
+void    Channel::set_invited(int fd)
+{
+    this->_invited.push_back(fd);
+}
+
+std::vector<int>    Channel::get_invited()
+{
+    return (this->_invited);
+}
