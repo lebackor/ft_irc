@@ -50,9 +50,9 @@ void    Server::channel_mode(Channel *channel, std::string mode, int fd, std::st
                     mode_o_command(channel, mode, buffer, fd);
 	    	    
                 
-                if (mode[i] == 'k' || mode[i] == 'l')
+                if (mode[i] == 'k' )
 			        deletedmode += mode[i];
-                if (mode[i] == 't')
+                if (mode[i] == 't' || mode[i] == 'l')
                 {
                     deletedmode += mode[i];
                     channel_mode.erase(channel_mode.find(mode[i]), 1);
