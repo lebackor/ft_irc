@@ -143,6 +143,7 @@ class Server{
         void    mode_channel_handler(std::string buffer, int fd);
         void    channel_mode(Channel *channel, std::string mode, int fd, std::string buffer);
 
+        void    invite_command(std::string buffer, int fd);
         void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
         void    mode_k_command(Channel *channel, std::string mode, std::string buffer, int fd);
         void    mode_l_command(Channel *channel, std::string mode, std::string buffer, int fd);

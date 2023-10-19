@@ -144,7 +144,7 @@ void	Server::check_connection()
 	else
 	{
 		this->_sendMessage("You need to enter a pass!", this->_newClientSocket);
-		close(this->_newClientSocket);
+		//close(this->_newClientSocket);
 	}
 	if (isPassGood == true)
 	{
