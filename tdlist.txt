@@ -1,0 +1,14 @@
+
+/////
+
+nc : ne pas crée la classe user tant que j'ai pas recu PASS USER et NICK donc tjr passer  dans la fonction recv msg et faire une conditio ndans recv qui va parser le msg uniquement si la classe user (qui sera link avec le fd en qt est crée)
+
+
+17 10
+
+MODE O = OK
+MODE K = OK
+MODE L = le - marche pas 
+
+
+19/10
