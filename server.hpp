@@ -139,6 +139,7 @@ class Server{
         void	   setUserInfo();
         void        setUsers(int fd, User *user);
         void        setChannels(std::string name, Channel *channel);
+        void        setBufferSd(int sd, std::string buffer);
         int        get_newClientSocket();
         bool    nicknameAlreadyUse(std::string nick);
         void    sendtoeveryone(std::string message, Channel *chan);
@@ -174,6 +175,9 @@ class Server{
         void    setServername(std::string servername);
         std::string    getServername();
         std::string     getPort();
+        std::map<int, std::string> &getBufferSd();
+        void        set_bufferstr(std::string str);
+        std::string get_bufferstr();
         Server(std::string port, std::string password);
         ~Server();
     private:
@@ -187,10 +191,12 @@ class Server{
         socklen_t _cliLen;
         std::map<int, User*>  _users;
         std::map<std::string, Channel*> _channels;
+        std::map<int, std::string> _buffer_sd;
         std::string _serverName;
         std::string _port;
         std::string _password;
         std::string _newbuff;
+        std::string _strbuffer;
 
         std::string _welcolmeirssi(int code);
         void _sendMessage(std::string message, int sd);

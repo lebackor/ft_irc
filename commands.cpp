@@ -7,7 +7,7 @@ void    Server::pong_command(std::string tmp, int i)
     size_t spacepos = tmp.find(" ");
     if (spacepos != std::string::npos) 
     {
-        std::string tmp(_buffer);
+        std::string tmp(_strbuffer);
         std::string prefix = "PONG ";
         std::string result = prefix;
         std::string extracted_part = tmp.substr(spacepos + 1);

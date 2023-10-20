@@ -18,6 +18,13 @@ struct pollfd	Server::get_clientfd()
 	return (*this->clientfd);
 }
 
+std::map<int, std::string> & Server::getBufferSd(){
+	return this->_buffer_sd;
+}
+void        Server::setBufferSd(int sd, std::string buffer){
+	this->_buffer_sd.insert(std::make_pair(sd, buffer));
+}
+
 std::map<int, User*> & Server::getUsers(){
 	return this->_users;
 }
@@ -29,6 +36,14 @@ std::map<std::string, Channel*> & Server::getChannels(){
 void	Server::setChannels(std::string name, Channel *channel)
 {
 	this->_channels.insert(std::make_pair(name, channel));
+}
+
+void        Server::set_bufferstr(std::string str){
+	this->_strbuffer = str;
+}
+
+std::string Server::get_bufferstr(){
+	return this->_strbuffer;
 }
 
 void	Server::setServername(std::string servername)
@@ -97,7 +112,7 @@ std::string Server::receiveMessage(int sd)
 
 void	Server::check_connection()
 {
-	std::string ret(_newbuff + _buffer);
+	std::string ret(_newbuff + _strbuffer);
 	size_t occ;
 	size_t firstOcc;
 	bool isPassGood = false, isNickGood = false, isUserGood = false;
@@ -279,7 +294,7 @@ bool	Server::firstConnection(int i)
 	if (isThereanUser(this->clientfd[i].fd) == true) //gérer que a la disconnect on doit delete le fd et la class user de la map
 		return false;	
 
-	std::string buffer_str(_buffer);
+	std::string buffer_str(_strbuffer);
 	
     bool hasCapLS = buffer_str.find("CAP LS") != std::string::npos;
 	bool hasPASS = buffer_str.find("PASS ") != std::string::npos;
@@ -437,6 +452,7 @@ void	Server::acceptClientconnexion()
 			int clientFlags = fcntl(this->_newClientSocket, F_GETFL, 0);
 			fcntl(this->_newClientSocket, F_SETFL, clientFlags | O_NONBLOCK);
 
+			this->setBufferSd(this->_newClientSocket, "");
 
 			for (int i = 1; i <= MAX_CLIENTS; i++)
 			{
@@ -456,20 +472,20 @@ void	Server::acceptClientconnexion()
 
 void	Server::recvClientMsg(int i)
 {
-	int bytesRead = recv(this->clientfd[i].fd, this->_buffer, sizeof(this->_buffer), 0);
+	//int bytesRead = recv(this->clientfd[i].fd, this->_buffer, sizeof(this->_buffer), 0);
 	
-	if (bytesRead <= 0)
-	{
-		std::cout << "Client " << i << " has been disconnected" << std::endl;
-		close(this->clientfd[i].fd);
-		memset(&this->clientfd[i], 0, sizeof(this->clientfd[i]));
-	}
-	else
-	{
-		this->_buffer[bytesRead] = '\0';
-		std::cout << "Client " << i << ": " << this->_buffer << std::endl;
+//	if (bytesRead <= 0)
+///	{
+	//	std::cout << "Client " << i << " has been disconnected" << std::endl;
+	//	close(this->clientfd[i].fd);
+	//	memset(&this->clientfd[i], 0, sizeof(this->clientfd[i]));
+	//}
+//	else
+//	{
+//		this->_buffer[bytesRead] = '\0';
+//		std::cout << "Client " << i << ": " << this->_buffer << std::endl;
 		bool firstconnection = firstConnection(i);
-		std::map<int, User*> tmp_user = getUsers();
+//		std::map<int, User*> tmp_user = getUsers();
 		if (firstconnection == true)
 		{
 			check_connection();
@@ -481,7 +497,7 @@ void	Server::recvClientMsg(int i)
 		}
 		else if (firstconnection == false)// dire que c pas caps ni user ni nick
 		{
-			std::string tmp(_buffer);
+			std::string tmp(_strbuffer);
 			if (tmp.find("PING ") != std::string::npos)
 				pong_command(tmp, i);
 			else if (tmp.find("PART ")!= std::string::npos)
@@ -503,7 +519,7 @@ void	Server::recvClientMsg(int i)
 			else if(tmp.find("INVITE ") != std::string::npos)
 				invite_command(tmp, i);
 		}
-	}
+//	}
 
 }
 
