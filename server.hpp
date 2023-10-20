@@ -132,11 +132,9 @@ class Server{
        
         void    error(const char *msg);
         void    acceptClientconnexion();
-        void    newConnection();
         void    recvClientMsg(int i);
         void    setserversocket();
         bool    firstConnection(int i);
-        void	   setUserInfo();
         void        setUsers(int fd, User *user);
         void        setChannels(std::string name, Channel *channel);
         void        setBufferSd(int sd, std::string buffer);
@@ -166,7 +164,6 @@ class Server{
         bool    isThereanUser(int fd);
         void    check_connection();
         User*	find_user_byfd(int fd);
-        std::string receiveMessage(int sd);
 
         User*    find_user(int fd);
 

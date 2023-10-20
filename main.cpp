@@ -1,6 +1,7 @@
 #include "server.hpp"
 
 class Server;
+void	handling_server_msg(Server *server, int i);
 
 int parse2(std::string str)
 {
@@ -23,6 +24,47 @@ int parse1(char *av1)
 	return 1;
 }
 
+void	handling_server_msg(Server *server, int i)
+{
+	std::string commandBuffer;
+	char buffer[1024];
+	int bytesRead;
+
+	bytesRead = recv(server->clientfd[i].fd, buffer, sizeof(buffer), 0);
+
+	if (bytesRead > 0)
+		buffer[bytesRead] = '\0';
+	else
+	{
+		std::cout << "Client " << i << " has been disconnected" << std::endl;
+		close(server->clientfd[i].fd);
+		memset(&server->clientfd[i], 0, sizeof(server->clientfd[i]));
+
+	}
+	commandBuffer = buffer;
+	if (!commandBuffer.empty() && commandBuffer.find('\n') == std::string::npos)
+	{
+		server->getBufferSd().find(server->clientfd[i].fd)->second += buffer;
+	}
+	else if (commandBuffer.find('\n') != std::string::npos)
+	{
+		if (!server->getBufferSd().find(server->clientfd[i].fd)->second.empty())
+		{
+			server->set_bufferstr(server->getBufferSd().find(server->clientfd[i].fd)->second + commandBuffer);
+			server->recvClientMsg(i);
+			server->get_bufferstr().clear();
+			server->getBufferSd().find(server->clientfd[i].fd)->second.clear();
+		}
+		else
+		{
+			server->set_bufferstr(commandBuffer);
+			server->recvClientMsg(i);
+			server->get_bufferstr().clear();
+		}
+	}
+
+}
+
 
 int main(int ac, char **av)
 {
@@ -41,56 +83,16 @@ int main(int ac, char **av)
 		{
 			for (int i = 1; i <= MAX_CLIENTS; i++)
 			{
-			
-			int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
-			if (numReady == -1)
-				perror("Error of poll()");
+				int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
 
-			if (server.clientfd[0].revents & POLLIN)
-				server.acceptClientconnexion();
+				if (numReady == -1)
+					perror("Error of poll()");
 
-			if (server.clientfd[i].revents & POLLIN)
-			{
-				std::string commandBuffer;
-				char buffer[1024];
-				int bytesRead;
+				if (server.clientfd[0].revents & POLLIN)
+					server.acceptClientconnexion();
 
-				bytesRead = recv(server.clientfd[i].fd, buffer, sizeof(buffer), 0);
-	
-				if (bytesRead > 0)
-					buffer[bytesRead] = '\0';
-				else
-				{
-					std::cout << "wont work" << std::endl; // je peux gérer le disconnect
-				}
-				commandBuffer = buffer;
-				if (!commandBuffer.empty() && commandBuffer.find('\n') == std::string::npos)
-				{
-					std::cout << "adding 0: " << buffer << std::endl;
-					server.getBufferSd().find(server.clientfd[i].fd)->second += buffer;
-				}
-				else if (commandBuffer.find('\n') != std::string::npos)
-				{
-					if (!server.getBufferSd().find(server.clientfd[i].fd)->second.empty())
-					{
-						server.set_bufferstr(server.getBufferSd().find(server.clientfd[i].fd)->second + commandBuffer);
-						std::cout << "adding 1: " << server.get_bufferstr() << std::endl;
-						server.recvClientMsg(i);
-						server.get_bufferstr().clear();
-						server.getBufferSd().find(server.clientfd[i].fd)->second.clear();
-					}
-					else
-					{
-						server.set_bufferstr(commandBuffer);
-						std::cout << "adding 2: " << server.get_bufferstr() << std::endl;
-						server.recvClientMsg(i);
-						server.get_bufferstr().clear();
-					}
-				}
-
-
-			//	std::cout << "leaving while with: " << server.getBufferSd().find(server.clientfd[i].fd)->second << std::endl;
-			}
+				if (server.clientfd[i].revents & POLLIN)
+					handling_server_msg(&server, i);
 			}
 		
 		}
