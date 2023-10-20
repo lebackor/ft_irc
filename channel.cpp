@@ -3,7 +3,11 @@
 
 Channel::Channel(std::string name) :_name(name){}
 
-Channel::~Channel(){}
+Channel::~Channel(){
+    _users.clear();
+    _chanUserOps.clear();
+    _invited.clear();
+}
 
 std::string Channel::get_channelname()
 {

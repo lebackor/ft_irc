@@ -4,17 +4,12 @@
 User::User(std::string nick, std::string user, std::string host, std::string realname)
  : _nick(nick), _user(user), _host(host), _realname(realname)
 {
-    std::cout << "From User class : " << std::endl;
-    std::cout << "Nickname: " << _nick << std::endl;
-    std::cout << "Username: " << _user << std::endl;
-    std::cout << "Hostname: " << _host << std::endl;
-    std::cout << "Realname: " << _realname << std::endl;
 
 }
 
 User::~User()
 {
-
+ //   _channels.clear();
 }
 
 void    User::setnickname(std::string name){

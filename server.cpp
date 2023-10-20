@@ -7,6 +7,22 @@ Server::Server(std::string port, std::string password) : _port(port), _password(
 }
 
 Server::~Server(){
+
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		it->second->~Channel();
+	    delete it->second;
+	}
+	_channels.clear();
+
+	for (std::map<int, User*>::iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		it->second->~User();
+	    delete it->second;
+	}
+	_users.clear();
+
+	_buffer_sd.clear();
 	close(this->_serverSocket);
 }
 
@@ -221,7 +237,7 @@ void	Server::check_connection()
 			//close(this->_newClientSocket);
 		}
 	}
-	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true)
+	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && running_status() == true)
 	{
 		_newbuff.erase(_newbuff.begin(), _newbuff.end());
 		this->_serverName = serverName;
@@ -234,7 +250,7 @@ void	Server::check_connection()
 		this->_sendMessage(send_codes(004, this, newUser, "", ""), this->_newClientSocket);
 
 	}
-	else if (isPassGood == true && isNickGood == true && isUserGood == true)
+	else if (isPassGood == true && isNickGood == true && isUserGood == true && running_status() == true)
 		this->_sendMessage(send_codes(005, this, NULL, nick, ""), this->_newClientSocket);
 }
 
@@ -311,6 +327,28 @@ void	Server::setserversocket()
 
 }
 
+void Server::user_disconnect(int sd)
+{
+    std::set<std::string> userChannels = this->getUsers().find(sd)->second->get_channels();
+    // erase user from each channel;
+    for (std::set<std::string>::iterator it = userChannels.begin(); it != userChannels.end(); it++)
+    {
+        std::string userAnswer = print_user(this->getUsers().find(sd)->second);
+        userAnswer += "PART " + *it;
+        sendtoeveryone(userAnswer, this->getChannels().find(*it)->second);
+        this->getChannels().find(*it)->second->rm_user(sd);
+        if (this->getChannels().find(*it)->second->getUsersNb() == 0)
+        {
+            delete this->getChannels().find(*it)->second;
+            this->getChannels().erase(*it);
+        }
+    }
+    this->getUsers().find(sd)->second->get_channels().clear();
+    delete this->getUsers().find(sd)->second;
+    this->getUsers().erase(sd);
+	close(sd);
+}
+
 
 void	Server::acceptClientconnexion()
 {
@@ -347,9 +385,9 @@ void	Server::recvClientMsg(int i)
 
 	bool firstconnection = firstConnection(i);
 
-	if (firstconnection == true)
+	if (firstconnection == true && running_status() == true)
 		check_connection();
-	else if (firstconnection == false)
+	else if (firstconnection == false && running_status() == true)
 	{
 		std::string tmp(_strbuffer);
 		if (tmp.find("PING ") != std::string::npos)

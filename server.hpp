@@ -18,7 +18,7 @@
 #include "channel.hpp"
 #include <set>
 #include <arpa/inet.h>
-
+#include <csignal>
 #define MAX_CLIENTS 100
 
 //#define SERVER_NAME "localhost"
@@ -123,13 +123,14 @@
     (user + " " + channel + ":is already on channel")
 
 
+
 class Server{
     public:
         char **av;
         struct pollfd clientfd[MAX_CLIENTS + 1];
         struct pollfd   get_clientfd();
        
-       
+
         void    error(const char *msg);
         void    acceptClientconnexion();
         void    recvClientMsg(int i);
@@ -175,6 +176,7 @@ class Server{
         std::map<int, std::string> &getBufferSd();
         void        set_bufferstr(std::string str);
         std::string get_bufferstr();
+        void user_disconnect(int sd);
         Server(std::string port, std::string password);
         ~Server();
     private:
@@ -203,12 +205,10 @@ class Server{
 
 
 
-void ft_bzero(void* s, std::size_t n);
-void ft_bcopy(const void* src, void* dest, std::size_t n);
-std::vector<char*> ft_split(char* input, char delimiter);
 std::string send_codes(int code, Server *serv, User *usr, std::string buf1, std::string buf2);
 std::string print_user(User *usr);
 void removeSpaces(std::string &str);
 bool nicknameIsValid(std::string nick);
 bool checkInvalidCharacter(char c);
 bool channelNameInvalid(std::string name);
+bool running_status();

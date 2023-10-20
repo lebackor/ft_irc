@@ -1,5 +1,7 @@
 #include "server.hpp"
 
+bool isRunning = true;
+
 class Server;
 void	handling_server_msg(Server *server, int i);
 
@@ -24,6 +26,20 @@ int parse1(char *av1)
 	return 1;
 }
 
+bool running_status()
+{
+	if (isRunning == true)
+		return true;
+	else
+		return false;
+}
+
+void    handler(int signum)
+{
+	(void)signum;
+	isRunning = false;
+}
+
 void	handling_server_msg(Server *server, int i)
 {
 	std::string commandBuffer;
@@ -37,16 +53,16 @@ void	handling_server_msg(Server *server, int i)
 	else
 	{
 		std::cout << "Client " << i << " has been disconnected" << std::endl;
-		close(server->clientfd[i].fd);
 		memset(&server->clientfd[i], 0, sizeof(server->clientfd[i]));
-
+	//	server->user_disconnect(server->clientfd[i].fd);
+		
 	}
 	commandBuffer = buffer;
-	if (!commandBuffer.empty() && commandBuffer.find('\n') == std::string::npos)
+	if (!commandBuffer.empty() && commandBuffer.find('\n') == std::string::npos && isRunning == true)
 	{
 		server->getBufferSd().find(server->clientfd[i].fd)->second += buffer;
 	}
-	else if (commandBuffer.find('\n') != std::string::npos)
+	else if (commandBuffer.find('\n') != std::string::npos && isRunning == true)
 	{
 		if (!server->getBufferSd().find(server->clientfd[i].fd)->second.empty())
 		{
@@ -79,14 +95,15 @@ int main(int ac, char **av)
 		Server server(av[1], av[2]);
 		server.av = av;
 		server.setserversocket();
-		while (1)
+		while (isRunning == true)
 		{
+    		std::signal(SIGINT, handler);
 			for (int i = 1; i <= MAX_CLIENTS; i++)
 			{
 				int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
 
 				if (numReady == -1)
-					perror("Error of poll()");
+					break ; //
 
 				if (server.clientfd[0].revents & POLLIN)
 					server.acceptClientconnexion();
@@ -96,13 +113,12 @@ int main(int ac, char **av)
 			}
 		
 		}
-
+		server.~Server();
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 	}
 	
-
 	return (0);
 }
