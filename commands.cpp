@@ -607,8 +607,6 @@ void    Server::priv_msg(std::string buffer, int fd)
     {
         if (this->getChannels().find(msgtarget) == this->getChannels().end())
             this->_sendMessage(send_codes(401, this, find_user(fd), msgtarget, ""), this->clientfd[fd].fd);
-        else if (this->getChannels().find(msgtarget)->second->isBan(find_user(fd)->get_nickname()) == true) //
-           this->_sendMessage(send_codes(404, this, find_user(fd), msgtarget, ""), this->clientfd[fd].fd);
         else
             this->sendinchanexceptuser(userAnswer, this->getChannels().find(msgtarget)->second, this->clientfd[fd].fd);
     }

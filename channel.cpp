@@ -43,7 +43,6 @@ void        Channel::set_topic(std::string topic){
     this->_topic = topic;
 }
 
-
 void Channel::addUser(int fd, User *usr)
 {
     this->_users.insert(std::make_pair(fd, usr));
@@ -52,14 +51,6 @@ void Channel::addUser(int fd, User *usr)
 void Channel::addChanops(int fd, User *usr)
 {
     this->_chanUserOps.insert(std::make_pair(fd, usr));
-}
-
-
-bool Channel::isBan(std::string nickname)
-{
-    if (this->_banlist.find(nickname) != this->_banlist.end())
-        return (true);
-    return (false);
 }
 
 bool    Channel::isChanop(int fd)

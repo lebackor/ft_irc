@@ -15,6 +15,7 @@
 #include <sstream>
 #include <map>
 #include <set>
+
 class User{
     public:
         User(std::string nick, std::string user, std::string host, std::string realname);

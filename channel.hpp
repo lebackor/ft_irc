@@ -39,9 +39,7 @@ class Channel{
         std::vector<int>    get_invited();
         std::map<int, User*> &getUsers();
         std::map<int, User*> &getChanOps();
-        std::map<std::string, std::string> &getBanlist();
         bool isChanop(int fd);
-        bool isBan(std::string nickname);
         void addChanops(int fd, User *usr);
         int searchuserbyname(std::string nickname);
 
@@ -54,5 +52,4 @@ class Channel{
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
         std::vector<int> _invited;
-        std::map<std::string, std::string>  _banlist;
 };
