@@ -31,7 +31,6 @@
 #define RPL_WELCOME(nick, user, host) \
     (":Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host)
 
-
 #define RPL_YOURHOST(hostname) \
     ("Your host is " + hostname + ", running version " ver)
 
@@ -191,7 +190,7 @@ class Server{
         std::string _serverName;
         std::string _port;
         std::string _password;
-        
+        std::string _newbuff;
 
         std::string _welcolmeirssi(int code);
         void _sendMessage(std::string message, int sd);

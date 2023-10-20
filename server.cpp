@@ -97,7 +97,7 @@ std::string Server::receiveMessage(int sd)
 
 void	Server::check_connection()
 {
-	std::string ret(_buffer);
+	std::string ret(_newbuff + _buffer);
 	size_t occ;
 	size_t firstOcc;
 	bool isPassGood = false, isNickGood = false, isUserGood = false;
@@ -107,7 +107,7 @@ void	Server::check_connection()
 	if (((ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos) || (ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos && ret.find("NICK ") != std::string::npos)) && ret.find("USER ") == std::string::npos)
 	{
 		std::cout << "there" << std::endl;
-		ret = this->receiveMessage(this->_newClientSocket);
+	//	ret = this->receiveMessage(this->_newClientSocket);
 	}
 	if ((occ = ret.find("PASS ")) != std::string::npos)
 	{
@@ -115,7 +115,7 @@ void	Server::check_connection()
 		if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 		{
 			this->_sendMessage(send_codes(461, this, NULL, "PASS", ""), this->_newClientSocket);
-			close(this->_newClientSocket);
+	//		close(this->_newClientSocket);
 		}
 		else
 		{
@@ -126,16 +126,17 @@ void	Server::check_connection()
 			{
 				std::cout << "EMPTY  PASSWORD" << std::endl;
 				this->_sendMessage(send_codes(461, this, NULL, "PASS", ""), this->_newClientSocket);
-				close(this->_newClientSocket);
+				//close(this->_newClientSocket);
 			}
 			else if (pass.compare(this->_password) != 0)
 			{
 				std::cout << "BAD PASSWORD" << std::endl;
 				this->_sendMessage("WRONG PASSWORD", this->_newClientSocket);
-				close(this->_newClientSocket);
+				//close(this->_newClientSocket);
 			}
 			else
 			{
+				_newbuff += ret;
 				std::cout << "GOOD PASSWORD" << std::endl;
 				isPassGood = true;
 			}
@@ -149,15 +150,15 @@ void	Server::check_connection()
 	if (isPassGood == true)
 	{
 		std::cout << "IN NICK" << std::endl;
-		if (ret.find("NICK ") == std::string::npos)
-			ret = this->receiveMessage(this->_newClientSocket);
+	//	if (ret.find("NICK ") == std::string::npos)
+			//ret = this->receiveMessage(this->_newClientSocket);
 		if ((occ = ret.find("NICK ")) != std::string::npos)
 		{
 			if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 			{
 				std::cout << "jsp dnickname" << std::endl;
 				this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
-				close(this->_newClientSocket);
+			//	close(this->_newClientSocket);
 			}
 			else
 			{
@@ -167,17 +168,18 @@ void	Server::check_connection()
 				{
 					std::cout << "nickname deja use" << std::endl;
 					this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
-					close(this->_newClientSocket);	
+				//	close(this->_newClientSocket);	
 				}
 				else if (nicknameAlreadyUse(nick))
 				{
 					std::cout << "nickname deja use" << std::endl;
 					this->_sendMessage(send_codes(433, this, NULL, nick, ""), this->_newClientSocket);
 					this->_sendMessage("Please try reconnect with an available nickname.", this->_newClientSocket);
-					close(this->_newClientSocket);
+				//	close(this->_newClientSocket);
 				}
 				else
 				{
+					_newbuff += ret;
 					std::cout << "GOOD NICNAMAE" << std::endl;
 					isNickGood = true;
 				}
@@ -187,7 +189,7 @@ void	Server::check_connection()
 		{
 				std::cout << "pas dnickname" << std::endl;
 			this->_sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_newClientSocket);
-			close(this->_newClientSocket);
+			//close(this->_newClientSocket);
 		}
 		if (isUserGood == false && isNickGood == true)
 		{
@@ -195,7 +197,7 @@ void	Server::check_connection()
 			if (ret.find("USER ") == std::string::npos)
 			{
 				std::cout << "PAS TROVUER USER" << std::endl;
-				ret = this->receiveMessage(this->_newClientSocket);
+			//	ret = this->receiveMessage(this->_newClientSocket);
 			}
 			if ((occ = ret.find("USER ")) != std::string::npos)
 			{
@@ -241,6 +243,7 @@ void	Server::check_connection()
 				}
 				if (!(user.empty() || host.empty() || serverName.empty() || realName.empty()))
 				{
+					_newbuff += ret;
 					std::cout << "USER GOOD " << std::endl;
 					isUserGood = true;
 				}
@@ -250,12 +253,12 @@ void	Server::check_connection()
 		{
 			std::cout << "pas un bon user " << std::endl;
 			this->_sendMessage("Usage: USER [username] [hostname] [serverName] [realName]", this->_newClientSocket);
-			close(this->_newClientSocket);
+			//close(this->_newClientSocket);
 		}
 	}
 	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true)
 	{
-		std::cout << "ca va ad un user "<< std::endl;
+		_newbuff.erase(_newbuff.begin(), _newbuff.end());
 		this->_serverName = serverName;
 		User *newUser = new User(nick, user, host, realName);
 		this->setUsers(this->_newClientSocket, newUser);

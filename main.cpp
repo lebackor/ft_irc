@@ -2,7 +2,7 @@
 
 class Server;
 
-int checkav2(std::string str)
+int parse2(std::string str)
 {
 	if (str.size() != 4)
 		return 1;
@@ -12,14 +12,14 @@ int checkav2(std::string str)
 	return 0;
 }
 
-int checkav1(char *av1)
+int parse1(char *av1)
 {
 	return 0;
 	if (strlen(av1) != 4)
 		return 1;
-//	int port = static_cast<int>(std::strtoul(av1, NULL, 0));
-//	if ((port >= 6660 && port <= 6669) || port == 6679 || port == 6697)
-//		return 0;
+	int port = static_cast<int>(std::strtoul(av1, NULL, 0));
+	if ((port >= 6660 && port <= 6669) || port == 6679 || port == 6697)
+		return 0;
 	return 1;
 }
 
@@ -30,9 +30,9 @@ int main(int ac, char **av)
 	{
 		if (ac != 3)
 			throw std::runtime_error("Usage: ./ircserv <port> <password>");
-		if (checkav1(av[1]) == 1)
+		if (parse1(av[1]) == 1)
 			throw std::runtime_error("Wrong port.");
-		if (checkav2(av[2]) == 1)
+		if (parse2(av[2]) == 1)
 			throw std::runtime_error("Wrong password.");
 		Server server(av[1], av[2]);
 		server.av = av;
@@ -46,13 +46,11 @@ int main(int ac, char **av)
 			if (numReady == -1)
 				perror("Error of poll()");
 
-			if (server.clientfd[0].revents & POLLIN) // ce serait mieux de faire boucle i pour check chaque node, ici on perd des ressources pr rien car il entre dedans dans  tt les cas et accept quand il en capte une
+			if (server.clientfd[0].revents & POLLIN)
 				server.acceptClientconnexion();
 
-			// gerer les donnes des clients connecter la
-			
-				if (server.clientfd[i].revents & POLLIN)
-					server.recvClientMsg(i);
+			if (server.clientfd[i].revents & POLLIN)
+				server.recvClientMsg(i);
 			}
 		
 		}

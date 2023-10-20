@@ -660,11 +660,6 @@ void Server::nick_command(std::string buffer, int fd)
         this->_sendMessage(send_codes(431, this, find_user(fd), "", ""), this->clientfd[fd].fd);
         return;
     }
-   /* if (find_user(fd)->getMode().find('r') != std::string::npos) //im not handling restricted mode
-    {
-        this->_sendMessage(send_codes(484, this, find_user(fd), "", ""), fd);
-        return;
-    }*/
     if (!nicknameIsValid(newNickname))
     {
         this->_sendMessage(send_codes(432, this, find_user(fd), newNickname, ""), this->clientfd[fd].fd);
