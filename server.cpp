@@ -10,20 +10,26 @@ Server::~Server(){
 
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
-		it->second->~Channel();
+		//if (it->second)
+		//	it->second->~Channel();
 	    delete it->second;
 	}
-	_channels.clear();
+	if (!_channels.empty())
+		_channels.clear();
 
 	for (std::map<int, User*>::iterator it = _users.begin(); it != _users.end(); ++it)
 	{
-		it->second->~User();
+		//if (it->second)
+		//	it->second->~User();
 	    delete it->second;
 	}
-	_users.clear();
+	if (!_users.empty())
+		_users.clear();
 
-	_buffer_sd.clear();
-	close(this->_serverSocket);
+	if (!_buffer_sd.empty())
+		_buffer_sd.clear();
+	
+close(this->_serverSocket);
 }
 
 int        Server::get_newClientSocket(){

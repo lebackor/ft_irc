@@ -113,7 +113,7 @@ int main(int ac, char **av)
 			}
 		
 		}
-		server.~Server();
+	//	server.~Server();
 	}
 	catch(const std::exception& e)
 	{
