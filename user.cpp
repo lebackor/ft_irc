@@ -55,7 +55,6 @@ void User::addchannel(std::string name)
 {
     if (this->_channels.find(name) == this->_channels.end())
         this->_channels.insert(name);
-    std::cout << "channel added: " << name << std::endl;
 }
 
 

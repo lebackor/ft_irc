@@ -293,7 +293,7 @@ void Server::_sendMessage(std::string message, int sd)
 	message += "\r\n";
 	if (send(sd, message.c_str(), message.length(), 0) < 0)
 		throw std::runtime_error("Error sending message.");
-	std::cout << "Server has sent this message: " << message << std::endl;
+	std::cout << "Server sent this msg: " << message << std::endl;
 }
 
 
