@@ -48,13 +48,14 @@ void	handling_server_msg(Server *server, int i)
 
 	bytesRead = recv(server->clientfd[i].fd, buffer, sizeof(buffer), 0);
 
+	std::cout << "client receive: " << buffer << std::endl;
 	if (bytesRead > 0)
 		buffer[bytesRead] = '\0';
 	else
 	{
 		std::cout << "Client " << i << " has been disconnected" << std::endl;
+		server->user_disconnect(server->clientfd[i].fd);
 		memset(&server->clientfd[i], 0, sizeof(server->clientfd[i]));
-	//	server->user_disconnect(server->clientfd[i].fd);
 		
 	}
 	commandBuffer = buffer;

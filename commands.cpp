@@ -165,6 +165,8 @@ void    Server::part_command(std::string tmp, int i)
     {
         std::string chan_name = channelname.substr(0, channelname.find(","));
         channelname.erase(0, channelname.find(",") + 1);
+        removeSpaces(chan_name);
+        std::cout << "chan name: " << chan_name << std::endl;
         if (this->getChannels().find(chan_name) == this->getChannels().end())
             _sendMessage(send_codes(403, this, find_user(i), chan_name, ""), this->clientfd[i].fd);
         else if (find_user(i)->get_channels().find(chan_name) == find_user(i)->get_channels().end())
@@ -382,6 +384,7 @@ void	Server::join_command(std::string buffer, int i)
         keysForChannels.erase(0, keysForChannels.find(",") + 1);
         if (this->getChannels().find(channelName) == this->getChannels().end())
         {
+            std::cout << "chan create:" << channelName << std::endl;
             Channel *chan = new Channel(channelName);
             this->setChannels(channelName, chan);
         }
