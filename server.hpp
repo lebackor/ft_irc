@@ -16,12 +16,13 @@
 #include <map>
 #include "user.hpp"
 #include "channel.hpp"
+#include "bot.hpp"
 #include <set>
 #include <arpa/inet.h>
 #include <csignal>
 #define MAX_CLIENTS 100
 
-//#define SERVER_NAME "localhost"
+
 #define ver "1.0"
 #define USER_MODE ""
 #define CHANNEL_MODE "itkol"
@@ -122,7 +123,7 @@
 #define ERR_USERONCHANNEL(user, channel) \
     (user + " " + channel + ":is already on channel")
 
-
+class Bot;
 
 class Server{
     public:
@@ -177,6 +178,7 @@ class Server{
         void        set_bufferstr(std::string str);
         std::string get_bufferstr();
         void user_disconnect(int sd);
+        Bot *getBot();
         Server(std::string port, std::string password);
         ~Server();
     private:
@@ -196,6 +198,7 @@ class Server{
         std::string _password;
         std::string _newbuff;
         std::string _strbuffer;
+        Bot         *_ircbot;
 
         std::string _welcolmeirssi(int code);
         void _sendMessage(std::string message, int sd);

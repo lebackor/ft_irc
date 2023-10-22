@@ -3,7 +3,7 @@
 
 Server::Server(std::string port, std::string password) : _port(port), _password(password)
 {
-
+	this->_ircbot = new Bot;
 }
 
 Server::~Server(){
@@ -29,7 +29,12 @@ Server::~Server(){
 	if (!_buffer_sd.empty())
 		_buffer_sd.clear();
 	
-close(this->_serverSocket);
+	delete this->_ircbot;
+	close(this->_serverSocket);
+}
+
+Bot* Server::getBot(){
+	return this->_ircbot;
 }
 
 int        Server::get_newClientSocket(){
@@ -316,6 +321,7 @@ void	Server::setserversocket()
 	this->_cliLen = sizeof(this->_cliAddr);
     if (bind(this->_serverSocket, (struct sockaddr *) &this->_servAddr, sizeof(this->_servAddr)) < 0)
 	{
+		delete this->_ircbot;
     	error("Binding failed.");
 	}
 

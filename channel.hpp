@@ -42,6 +42,8 @@ class Channel{
         bool isChanop(int fd);
         void addChanops(int fd, User *usr);
         int searchuserbyname(std::string nickname);
+        bool    getBotStatus();
+        void    setBotStatus();
 
     private:
         std::string _name;
@@ -52,4 +54,5 @@ class Channel{
         std::map<int, User*> _users;
         std::map<int, User*> _chanUserOps;
         std::vector<int> _invited;
+        bool    _isBot;
 };

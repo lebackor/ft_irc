@@ -1,7 +1,7 @@
 #include "channel.hpp"
 
 
-Channel::Channel(std::string name) :_name(name){}
+Channel::Channel(std::string name) :_name(name), _isBot(false){}
 
 Channel::~Channel(){
     _users.clear();
@@ -137,4 +137,12 @@ void    Channel::set_invited(int fd)
 std::vector<int>    Channel::get_invited()
 {
     return (this->_invited);
+}
+
+bool    Channel::getBotStatus(){
+    return this->_isBot;
+}
+
+void    Channel::setBotStatus(){
+    this->_isBot = !this->_isBot;
 }

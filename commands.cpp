@@ -440,6 +440,7 @@ void	Server::join_command(std::string buffer, int i)
         {
             this->_sendMessage(send_codes(353, this, find_user(i), channelName, listOfUser), this->clientfd[i].fd);
             this->_sendMessage(send_codes(366, this, find_user(i), channelName, ""), this->clientfd[i].fd);
+            this->getBot()->sendgreetings(this, this->getChannels().find(channelName)->second, this->clientfd[i].fd);
         }
         if (!this->getChannels().find(channelName)->second->get_mode().empty())
             this->_sendMessage(send_codes(324, this, find_user(i), channelName, this->getChannels().find(channelName)->second->get_mode()), this->clientfd[i].fd);
@@ -578,6 +579,37 @@ void Server::oper_command(std::string buffer, int fd)
         this->_sendMessage(send_codes(464, this, find_user_byfd(this->searchUserby_nickname(user)), "", ""), this->clientfd[fd].fd);
 }
 
+bool prefixBot(std::string buffer) {
+    int i = 0;
+    int j;
+    for (j = 0; buffer[j] && i < 2; j++)
+    {
+        if (buffer[j] == ' ' || buffer[j] == '\t')
+        {
+            while (buffer[j] && (buffer[j] == ' ' || buffer[j] == '\t'))
+                j++;
+            i++;
+            j--;
+        }
+    }
+    if (buffer[j] == '!' || (buffer[j] == ':' && buffer[j + 1] == '!'))
+        return true;
+    return false;
+}
+
+std::string parseBot(std::string buffer){
+    size_t exclamationMarkPos = buffer.find('!');
+    size_t endPos;
+    if (buffer.find('\r') != std::string::npos) {
+        endPos = exclamationMarkPos + 1;
+    } else {
+        endPos = exclamationMarkPos;
+    }
+
+    std::string command = buffer.substr(exclamationMarkPos + 1, endPos - exclamationMarkPos);
+    return command;
+}
+
 void    Server::priv_msg(std::string buffer, int fd)
 {
     int tmp;
@@ -606,6 +638,10 @@ void    Server::priv_msg(std::string buffer, int fd)
     {
         if (this->getChannels().find(msgtarget) == this->getChannels().end())
             this->_sendMessage(send_codes(401, this, find_user(fd), msgtarget, ""), this->clientfd[fd].fd);
+        else if (prefixBot(buffer) == true){
+            std::string command = buffer.substr(buffer.find('!') + 1, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - (buffer.find('!') + 1) : buffer.length() - 1 - (buffer.find('!') + 1));
+            this->getBot()->commandBotHandler(this, this->getChannels().find(msgtarget)->second, this->clientfd[fd].fd, buffer);
+        }
         else
             this->sendinchanexceptuser(userAnswer, this->getChannels().find(msgtarget)->second, this->clientfd[fd].fd);
     }

@@ -5,6 +5,7 @@ SRCS =	server.cpp\
 		commands.cpp\
 		channel.cpp\
 		sendmsgncodes.cpp\
+		bot.cpp\
 		
 
 
