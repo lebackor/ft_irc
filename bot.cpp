@@ -64,12 +64,11 @@ void    Bot::commandBotHandler(Server *serv, Channel *chan, int sd, std::string 
         this->quitBot(serv, chan, sd);
     else if (chan->getBotStatus() == true && buffer.find("!bot") == std::string::npos)
     {
-
         if (buffer.find("test") != std::string::npos)
             serv->sendtoeveryone(print_userbot() + " PRIVMSG " + chan->get_channelname() + " Hello " + serv->find_user_byfd(sd)->get_nickname() + " !", chan);
     }
     else
-        sendMessage(print_userbot() + " PRIVMSG " + chan->get_channelname() + " :Je me récupère laisse moi stp", sd);
+        sendMessage(print_userbot() + " PRIVMSG " + chan->get_channelname() + " :Arrête de m'appeler stp je suis déja la", sd);
 
 }
 
@@ -78,6 +77,16 @@ void    Bot::sendgreetings(Server *serv, Channel *chan, int sd){
     if (chan->getBotStatus() == true)
     {
         serv->sendtoeveryone(print_userbot() + " PRIVMSG " + chan->get_channelname() + " Everybody say hello to our friend " + serv->find_user_byfd(sd)->get_nickname() + " !", chan);
+    }
+    else
+        return ;
+}
+
+void    Bot::sendbye(Server *serv, Channel *chan, int sd){
+
+    if (chan->getBotStatus() == true)
+    {
+        serv->sendtoeveryone(print_userbot() + " PRIVMSG " + chan->get_channelname() + " Everybody say bye to our friend " + serv->find_user_byfd(sd)->get_nickname() + " !", chan);
     }
     else
         return ;

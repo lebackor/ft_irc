@@ -174,6 +174,7 @@ void    Server::part_command(std::string tmp, int i)
         {
             std::string response = print_user(find_user(i));
             response += "PART " + chan_name + " " + msg;
+            this->getBot()->sendbye(this, this->getChannels().find(chan_name)->second, this->clientfd[i].fd);
             _sendMessage(response, this->clientfd[i].fd);
             this->getChannels().find(chan_name)->second->rm_user(i);
             if (this->getChannels().find(chan_name)->second->getUsersNb() == 0)

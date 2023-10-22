@@ -15,6 +15,7 @@ class Bot{
         void    quitBot(Server *serv, Channel *chan, int sd);
         void    commandBotHandler(Server *serv, Channel *chan, int sd, std::string buffer);
         void    sendgreetings(Server *serv, Channel *chan, int sd);
+        void    sendbye(Server *serv, Channel *chan, int sd);
         Bot();
         ~Bot();
 
