@@ -48,7 +48,6 @@ void	handling_server_msg(Server *server, int i)
 
 	bytesRead = recv(server->clientfd[i].fd, buffer, sizeof(buffer), 0);
 
-	std::cout << "client receive: " << buffer << std::endl;
 	if (bytesRead > 0)
 		buffer[bytesRead] = '\0';
 	else
@@ -104,7 +103,7 @@ int main(int ac, char **av)
 				int numReady = poll(server.clientfd, MAX_CLIENTS + 1, -1);
 
 				if (numReady == -1)
-					break ; //
+					break ;
 
 				if (server.clientfd[0].revents & POLLIN)
 					server.acceptClientconnexion();
@@ -112,9 +111,7 @@ int main(int ac, char **av)
 				if (server.clientfd[i].revents & POLLIN)
 					handling_server_msg(&server, i);
 			}
-		
 		}
-	//	server.~Server();
 	}
 	catch(const std::exception& e)
 	{

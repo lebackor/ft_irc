@@ -10,8 +10,6 @@ Server::~Server(){
 
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
-		//if (it->second)
-		//	it->second->~Channel();
 	    delete it->second;
 	}
 	if (!_channels.empty())
@@ -19,8 +17,6 @@ Server::~Server(){
 
 	for (std::map<int, User*>::iterator it = _users.begin(); it != _users.end(); ++it)
 	{
-		//if (it->second)
-		//	it->second->~User();
 	    delete it->second;
 	}
 	if (!_users.empty())
@@ -140,7 +136,6 @@ void	Server::check_connection()
 		if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 		{
 			this->_sendMessage(send_codes(461, this, NULL, "PASS", ""), this->_newClientSocket);
-	//		close(this->_newClientSocket);
 		}
 		else
 		{
@@ -150,12 +145,10 @@ void	Server::check_connection()
 			if (pass.empty())
 			{
 				this->_sendMessage(send_codes(461, this, NULL, "PASS", ""), this->_newClientSocket);
-				//close(this->_newClientSocket);
 			}
 			else if (pass.compare(this->_password) != 0)
 			{
 				this->_sendMessage("WRONG PASSWORD", this->_newClientSocket);
-				//close(this->_newClientSocket);
 			}
 			else
 			{
@@ -167,7 +160,6 @@ void	Server::check_connection()
 	else
 	{
 		this->_sendMessage("You need to enter a pass!", this->_newClientSocket);
-		//close(this->_newClientSocket);
 	}
 	if (isPassGood == true)
 	{
@@ -176,7 +168,6 @@ void	Server::check_connection()
 			if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 			{
 				this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
-			//	close(this->_newClientSocket);
 			}
 			else
 			{
@@ -185,13 +176,11 @@ void	Server::check_connection()
 				if (!nicknameIsValid(nick))
 				{
 					this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
-				//	close(this->_newClientSocket);	
 				}
 				else if (nicknameAlreadyUse(nick))
 				{
 					this->_sendMessage(send_codes(433, this, NULL, nick, ""), this->_newClientSocket);
 					this->_sendMessage("Please try reconnect with an available nickname.", this->_newClientSocket);
-				//	close(this->_newClientSocket);
 				}
 				else
 				{
@@ -203,7 +192,6 @@ void	Server::check_connection()
 		else
 		{
 			this->_sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_newClientSocket);
-			//close(this->_newClientSocket);
 		}
 		if (isUserGood == false && isNickGood == true)
 		{
@@ -245,7 +233,6 @@ void	Server::check_connection()
 		if (isUserGood == false && isNickGood == true)
 		{
 			this->_sendMessage("Usage: USER [username] [hostname] [serverName] [realName]", this->_newClientSocket);
-			//close(this->_newClientSocket);
 		}
 	}
 	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && running_status() == true)
@@ -342,7 +329,7 @@ void	Server::setserversocket()
 void Server::user_disconnect(int sd)
 {
     std::set<std::string> userChannels = this->getUsers().find(sd)->second->get_channels();
-    // erase user from each channel;
+
     for (std::set<std::string>::iterator it = userChannels.begin(); it != userChannels.end(); it++)
     {
         std::string userAnswer = print_user(this->getUsers().find(sd)->second);

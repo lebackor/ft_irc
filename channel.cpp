@@ -112,7 +112,7 @@ void        Channel::set_mode(std::string mode){
 void    Channel::set_key(std::string key)
 {
     this->_key = key;
-    std::cout << "Set key in channel" << this->get_channelname() << "to :" << key << std::endl;
+    std::cout << "Set key in channel" << this->get_channelname() << "to : " << key << std::endl;
 }
 
 std::string Channel::get_key()

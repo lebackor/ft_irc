@@ -9,7 +9,7 @@ User::User(std::string nick, std::string user, std::string host, std::string rea
 
 User::~User()
 {
- //   _channels.clear();
+
 }
 
 void    User::setnickname(std::string name){

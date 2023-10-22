@@ -1,6 +1,6 @@
 #include "bot.hpp"
 
-void sendMessage(std::string message, int sd); // same as server->_sendMessage i'm just too lazy to make this function public
+void sendMessage(std::string message, int sd); 
 
 Bot::Bot() : _name("FarksBOT")
 {}
