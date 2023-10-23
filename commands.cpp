@@ -173,10 +173,12 @@ void    Server::part_command(std::string tmp, int i)
         else
         {
             std::string response = print_user(find_user(i));
-            response += "PART " + chan_name + " " + msg;
+           // response += "PART " + chan_name + " " + msg;
+            response += "PART " + chan_name;
             this->getBot()->sendbye(this, this->getChannels().find(chan_name)->second, this->clientfd[i].fd);
+            std::cout << "response :" << response << std::endl;
             _sendMessage(response, this->clientfd[i].fd);
-            this->getChannels().find(chan_name)->second->rm_user(i);
+            this->getChannels().find(chan_name)->second->rm_user(this->clientfd[i].fd);
             if (this->getChannels().find(chan_name)->second->getUsersNb() == 0)
             {
                 delete this->getChannels().find(chan_name)->second;
