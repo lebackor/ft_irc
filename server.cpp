@@ -167,6 +167,10 @@ void	Server::check_connection()
 		{
 			if ((firstOcc = ret.find_first_not_of(" \t\r\n", occ + 5)) == std::string::npos)
 			{
+				this->get_bufferstr().clear();
+				this->getBufferSd().find(this->_newClientSocket)->second.clear();
+				_newbuff.clear();
+				_strbuffer.clear();
 				this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
 			}
 			else
@@ -175,6 +179,10 @@ void	Server::check_connection()
 				nick = nick.substr(0, nick.find_last_not_of(" \t\r\n", nick.size()) + 1);
 				if (!nicknameIsValid(nick))
 				{
+					this->get_bufferstr().clear();
+					this->getBufferSd().find(this->_newClientSocket)->second.clear();
+					_newbuff.clear();
+					_strbuffer.clear();
 					this->_sendMessage(send_codes(432, this, NULL, nick, ""), this->_newClientSocket);
 				}
 				else if (nicknameAlreadyUse(nick))
