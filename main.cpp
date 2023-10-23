@@ -55,7 +55,7 @@ void	handling_server_msg(Server *server, int i)
 		std::cout << "Client " << i << " has been disconnected" << std::endl;
 		server->user_disconnect(server->clientfd[i].fd);
 		memset(&server->clientfd[i], 0, sizeof(server->clientfd[i]));
-		
+
 	}
 	commandBuffer = buffer;
 	if (!commandBuffer.empty() && commandBuffer.find('\n') == std::string::npos && isRunning == true)
@@ -117,6 +117,6 @@ int main(int ac, char **av)
 	{
 		std::cerr << e.what() << '\n';
 	}
-	
+
 	return (0);
 }

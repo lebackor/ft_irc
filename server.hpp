@@ -39,7 +39,7 @@
     (channel + " :" + topic)
 
 #define RPL_CREATED \
-("This server was created 03/04/02")
+("This server was created 09/09/23")
 
 #define RPL_BOUNCE(servername, port) \
     ("Try server " + servername + ", port " + port)
@@ -82,7 +82,7 @@
 
 #define ERR_NICKNAMEINUSE(nick) \
     (nick + " :Nickname is already in use")
-    
+
 #define ERR_NOSUCHNICK(nick) \
     (nick + " :No such nick/channel")
 
@@ -112,14 +112,14 @@
 #define ERR_KEYSET(channel)\
     (channel + " :Channel key already set")
 
-//472    
+//472
 #define ERR_UNKNOWNMODE(c, channel) \
     (c + ":is unknown mode char to me for " + channel)
 //341
 #define RPL_INVITING(channel, nick) \
     (channel + " " +nick)
 
-//443   
+//443
 #define ERR_USERONCHANNEL(user, channel) \
     (user + " " + channel + ":is already on channel")
 
@@ -130,7 +130,7 @@ class Server{
         char **av;
         struct pollfd clientfd[MAX_CLIENTS + 1];
         struct pollfd   get_clientfd();
-       
+
 
         void    error(const char *msg);
         void    acceptClientconnexion();
@@ -143,7 +143,7 @@ class Server{
         int        get_newClientSocket();
         bool    nicknameAlreadyUse(std::string nick);
         void    sendtoeveryone(std::string message, Channel *chan);
-        
+
         void    join_command(std::string tmp, int i);
         void    part_command(std::string tmp, int i);
         void    pong_command(std::string tmp, int i);
@@ -155,7 +155,7 @@ class Server{
         void    mode_o_command(Channel *channel, std::string mode, std::string tmp, int fd);
         void    mode_k_command(Channel *channel, std::string mode, std::string buffer, int fd);
         void    mode_l_command(Channel *channel, std::string mode, std::string buffer, int fd);
-    
+
         void    oper_command(std::string buffer, int fd);
         void    nick_command(std::string buffer, int fd);
         void topic_command(std::string buffer, int sd);

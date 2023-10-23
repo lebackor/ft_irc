@@ -24,7 +24,7 @@ Server::~Server(){
 
 	if (!_buffer_sd.empty())
 		_buffer_sd.clear();
-	
+
 	delete this->_ircbot;
 	close(this->_serverSocket);
 }
@@ -84,7 +84,7 @@ bool    Server::isThereanUser(int fd)
 	if (this->_users.find(fd) == this->_users.end())
 		return (false);
 	else
-		return (true); 
+		return (true);
 }
 std::string Server::getPort()
 {
@@ -181,6 +181,9 @@ void	Server::check_connection()
 				{
 					this->_sendMessage(send_codes(433, this, NULL, nick, ""), this->_newClientSocket);
 					this->_sendMessage("Please try reconnect with an available nickname.", this->_newClientSocket);
+					_newbuff.clear();
+					_strbuffer.clear();
+					close(this->_newClientSocket);
 				}
 				else
 				{
@@ -256,10 +259,10 @@ bool	Server::firstConnection(int i)
 {
 
 	if (isThereanUser(this->clientfd[i].fd) == true)
-		return false;	
+		return false;
 
 	std::string buffer_str(_strbuffer);
-	
+
     bool hasCapLS = buffer_str.find("CAP LS") != std::string::npos;
 	bool hasPASS = buffer_str.find("PASS ") != std::string::npos;
     bool hasNick = buffer_str.find("NICK ") != std::string::npos;
@@ -282,10 +285,13 @@ int Server::searchUserby_nickname(std::string nickname)
 
 void Server::_sendMessage(std::string message, int sd)
 {
-	message += "\r\n";
-	if (send(sd, message.c_str(), message.length(), 0) < 0)
-		throw std::runtime_error("Error sending message.");
-	std::cout << "Server sent this msg: " << message << std::endl;
+	if (running_status() == true)
+	{
+		message += "\r\n";
+		if (send(sd, message.c_str(), message.length(), 0) < 0)
+			throw std::runtime_error("Error sending message.");
+		std::cout << "Server sent this msg: " << message << std::endl;
+	}
 }
 
 
@@ -297,7 +303,7 @@ void	Server::setserversocket()
 	    error("Error opening socket");
 	}
 
-	
+
 	this->_portnb = atoi(this->av[1]);
 
     memset(&this->_servAddr, 0, sizeof(this->_servAddr));
@@ -312,10 +318,10 @@ void	Server::setserversocket()
     	error("Binding failed.");
 	}
 
-	listen(this->_serverSocket, 5); // 5 is the number max of clients can connect simultanately
+	listen(this->_serverSocket, 100); // 100 is the number max of clients can connect simultanately
 
 
-	
+
 	memset(this->clientfd, 0, sizeof(this->clientfd));
 
 	this->clientfd[0].fd = this->_serverSocket;
@@ -328,20 +334,11 @@ void	Server::setserversocket()
 
 void Server::user_disconnect(int sd)
 {
-    std::set<std::string> userChannels = this->getUsers().find(sd)->second->get_channels();
-
-    for (std::set<std::string>::iterator it = userChannels.begin(); it != userChannels.end(); it++)
-    {
-        std::string userAnswer = print_user(this->getUsers().find(sd)->second);
-        userAnswer += "PART " + *it;
-        sendtoeveryone(userAnswer, this->getChannels().find(*it)->second);
-        this->getChannels().find(*it)->second->rm_user(sd);
-        if (this->getChannels().find(*it)->second->getUsersNb() == 0)
-        {
-            delete this->getChannels().find(*it)->second;
-            this->getChannels().erase(*it);
-        }
-    }
+	if (isThereanUser(sd) == false)
+	{
+		close(sd);
+		return ;
+	}
     this->getUsers().find(sd)->second->get_channels().clear();
     delete this->getUsers().find(sd)->second;
     this->getUsers().erase(sd);
@@ -352,7 +349,7 @@ void Server::user_disconnect(int sd)
 void	Server::acceptClientconnexion()
 {
 
-	this->_newClientSocket = accept(this->_serverSocket, (struct sockaddr*)&this->_cliAddr, &this->_cliLen);	
+	this->_newClientSocket = accept(this->_serverSocket, (struct sockaddr*)&this->_cliAddr, &this->_cliLen);
 		if (this->_newClientSocket == -1)
 			perror("Error accepting a connection");
 		else
@@ -384,6 +381,8 @@ void	Server::recvClientMsg(int i)
 
 	bool firstconnection = firstConnection(i);
 
+	if (this->clientfd[i].fd == 0)
+		return ;
 	if (firstconnection == true && running_status() == true)
 		check_connection();
 	else if (firstconnection == false && running_status() == true)
@@ -410,6 +409,5 @@ void	Server::recvClientMsg(int i)
 		else if(tmp.find("INVITE ") != std::string::npos)
 			invite_command(tmp, i);
 	}
-
 }
 

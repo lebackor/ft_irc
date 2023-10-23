@@ -1,6 +1,6 @@
 #include "bot.hpp"
 
-void sendMessage(std::string message, int sd); 
+void sendMessage(std::string message, int sd);
 
 Bot::Bot() : _name("FarksBOT")
 {}
@@ -68,7 +68,7 @@ void    Bot::commandBotHandler(Server *serv, Channel *chan, int sd, std::string 
             serv->sendtoeveryone(print_userbot() + " PRIVMSG " + chan->get_channelname() + " Hello " + serv->find_user_byfd(sd)->get_nickname() + " !", chan);
     }
     else
-        sendMessage(print_userbot() + " PRIVMSG " + chan->get_channelname() + " :Arrête de m'appeler stp je suis déja la", sd);
+        sendMessage(print_userbot() + " PRIVMSG " + chan->get_channelname() + " :Arrête de m'appeler stp", sd);
 
 }
 
