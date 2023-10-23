@@ -321,7 +321,7 @@ void    Server::invite_command(std::string buffer, int fd)
     userAnswer += "INVITE " + usernickname + " " + chan_name;
 
     removeSpaces(chan_name);
-
+    removeSpaces(usernickname);
     if (chan_name.empty())
     {
         this->_sendMessage(send_codes(461, this, find_user(fd), "INVITE", ""), this->clientfd[fd].fd);
@@ -329,7 +329,7 @@ void    Server::invite_command(std::string buffer, int fd)
     }
     if ((userToSendSd = this->searchUserby_nickname(usernickname)) == -1)
         this->_sendMessage(send_codes(401, this, find_user(fd), userAnswer, ""), this->clientfd[fd].fd);
-    if (this->getChannels().find(chan_name)->second->getUsers().find(this->searchUserby_nickname(usernickname)) != this->getChannels().find(chan_name)->second->getUsers().end())
+    else if (this->getChannels().find(chan_name)->second->getUsers().find(this->searchUserby_nickname(usernickname)) != this->getChannels().find(chan_name)->second->getUsers().end())
         this->_sendMessage(send_codes(443, this, find_user(fd), usernickname, chan_name), this->clientfd[fd].fd);
     else if (this->getChannels().find(chan_name) == this->getChannels().end())
         this->_sendMessage(send_codes(403, this, find_user(fd), chan_name, ""), this->clientfd[fd].fd);
