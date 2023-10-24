@@ -6,15 +6,15 @@ SRCS =	server.cpp\
 		channel.cpp\
 		sendmsgncodes.cpp\
 		bot.cpp\
-		
 
 
 
-NAME = server
+
+NAME = ircserv
 
 CC = c++
 
-FLAGS = -Wall -Werror -Wextra -std=c++98 -g3# -fsanitize=address
+FLAGS = -Wall -Werror -Wextra -std=c++98
 
 OBJS = $(SRCS:.cpp=.o)
 
